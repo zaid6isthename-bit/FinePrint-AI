@@ -1,0 +1,51 @@
+generator client {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String      @id @default(uuid())
+  email          String      @unique
+  hashedPassword String
+  firstName      String?
+  lastName       String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  documents      Document[]
+}
+
+model Document {
+  id               String       @id @default(uuid())
+  title            String
+  filename         String
+  uploadDate       DateTime     @default(now())
+  riskScore        Float?
+  status           DocStatus    @default(PROCESSING)
+  userId           String
+  user             User         @relation(fields: [userId], references: [id])
+  clauses          Clause[]
+  negotiationMsg   String?      // Storing the generated message
+}
+
+enum DocStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model Clause {
+  id               String       @id @default(uuid())
+  documentId       String
+  document         Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  originalText     String       
+  simplifiedText   String?
+  clauseType       String       // e.g., 'Hidden Charges', 'Auto Renewal'
+  riskLevel        String       // 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'
+  severityScore    Float        // 0.0 to 1.0
+}
