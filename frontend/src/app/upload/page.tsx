@@ -1,14 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Upload, File, Loader2, AlertCircle } from "lucide-react";
-import { useCallback, useState } from "react";
+import { Upload, FileIcon, Loader2, AlertCircle } from "lucide-react";
+import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/lib/api";
 
 export default function UploadPage() {
     const [file, setFile] = useState<File | null>(null);
@@ -16,6 +18,13 @@ export default function UploadPage() {
     const [isUploading, setIsUploading] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
+    const { user, isLoading: authLoading } = useAuth();
+
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push("/login");
+        }
+    }, [user, authLoading, router]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -40,17 +49,41 @@ export default function UploadPage() {
         }
 
         setIsUploading(true);
-        // TODO: Connect to actual FastAPI backend
-        // Simulating API call for now to show UI flow
-        setTimeout(() => {
-            setIsUploading(false);
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+
             toast({
                 title: "Analysis Started",
                 description: "Your document is being processed by our ML engine.",
             });
-            router.push("/dashboard/demo-id"); // Router to a demo dashboard for now
-        }, 2000);
+
+            router.push(`/dashboard/${response.data.id}`);
+        } catch (error: any) {
+            toast({
+                title: "Upload Failed",
+                description: error.response?.data?.detail || "Could not upload the document. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsUploading(false);
+        }
     };
+
+    if (authLoading || !user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
@@ -95,7 +128,7 @@ export default function UploadPage() {
                         {file ? (
                             <div className="flex flex-col items-center gap-4">
                                 <div className="p-4 bg-blue-500/20 rounded-full">
-                                    <File className="h-10 w-10 text-blue-400" />
+                                    <FileIcon className="h-10 w-10 text-blue-400" />
                                 </div>
                                 <div>
                                     <p className="text-xl font-semibold mb-1">{file.name}</p>
