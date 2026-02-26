@@ -1,14 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Copy, AlertTriangle, Info, MessageSquare, Download, CheckCircle2, File as FileIcon, Loader2, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+    Copy, AlertTriangle, Info, MessageSquare, Download, CheckCircle2,
+    File as FileIcon, Loader2, RefreshCw, ArrowRight, ShieldCheck,
+    Zap, ExternalLink, ChevronRight
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { AIPresence } from "@/components/AIPresence";
 import api from "@/lib/api";
 
 interface Clause {
@@ -32,7 +35,7 @@ interface DocumentData {
 export default function Dashboard() {
     const [data, setData] = useState<DocumentData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState("overview");
+    const [selectedClause, setSelectedClause] = useState<Clause | null>(null);
     const { id } = useParams();
     const { user, isLoading: authLoading } = useAuth();
     const { toast } = useToast();
@@ -43,54 +46,46 @@ export default function Dashboard() {
             router.push("/login");
             return;
         }
-
-        if (id) {
-            fetchData();
-        }
+        if (id) fetchData();
     }, [id, user, authLoading]);
 
     const fetchData = async () => {
         try {
-            setLoading(true);
             const response = await api.get(`/documents/${id}`);
             setData(response.data);
-
-            // If still processing, poll again in 5 seconds
+            if (response.data.status === "COMPLETED" && response.data.clauses.length > 0 && !selectedClause) {
+                setSelectedClause(response.data.clauses[0]);
+            }
             if (response.data.status === "PROCESSING") {
-                setTimeout(fetchData, 5000);
+                setTimeout(fetchData, 4000);
             }
         } catch (error) {
-            console.error("Failed to fetch document:", error);
-            toast({
-                title: "Error",
-                description: "Failed to load document analysis.",
-                variant: "destructive",
-            });
+            console.error("Fetch error:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    const copyToClipboard = () => {
+    const copyNegotiation = () => {
         if (data?.negotiationMsg) {
             navigator.clipboard.writeText(data.negotiationMsg);
-            toast({
-                title: "Copied to clipboard",
-                description: "You can now paste this message into WhatsApp or Email.",
-            });
+            toast({ title: "Draft Copied", description: "Negotiation message is ready for use." });
         }
     };
 
-    const getScoreColor = (score: number) => {
-        if (score < 30) return "text-emerald-400";
-        if (score < 60) return "text-yellow-400";
-        return "text-red-400";
+    const getRiskColor = (level: string) => {
+        switch (level) {
+            case 'CRITICAL': return 'text-red-400';
+            case 'HIGH': return 'text-orange-400';
+            case 'MEDIUM': return 'text-amber-400';
+            default: return 'text-primary';
+        }
     };
 
     if (authLoading || (loading && !data)) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <AIPresence status="analyzing" />
             </div>
         );
     }
@@ -98,155 +93,250 @@ export default function Dashboard() {
     if (!data) return null;
 
     return (
-        <div className="min-h-screen pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
-                <div>
-                    <h1 className="text-3xl font-bold mb-2">{data.title}</h1>
-                    <div className="text-zinc-400 flex items-center gap-3">
-                        {data.status === "COMPLETED" ? (
-                            <span className="flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                                Analysis Complete
-                            </span>
-                        ) : data.status === "PROCESSING" ? (
-                            <span className="flex items-center gap-2 text-blue-400">
-                                <RefreshCw className="h-4 w-4 animate-spin" />
-                                AI is analyzing...
-                            </span>
-                        ) : (
-                            <span className="text-red-400">Analysis Failed</span>
-                        )}
-                        <span className="text-zinc-600">•</span>
-                        <span>ID: {data.id}</span>
-                    </div>
-                </div>
-                <Button variant="outline" className="gap-2" disabled={data.status !== "COMPLETED"}>
-                    <Download className="h-4 w-4" />
-                    Export Report
-                </Button>
+        <main className="min-h-screen pt-28 pb-12 px-6 lg:px-12 bg-background relative overflow-hidden">
+            {/* Background Calm Atmosphere */}
+            <div className="absolute top-0 inset-x-0 h-screen pointer-events-none">
+                <div className="absolute top-[10%] left-[-10%] w-[50%] h-[50%] bg-primary/5 blur-[120px] rounded-full" />
+                <div className="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-indigo-500/5 blur-[100px] rounded-full" />
             </div>
 
-            {data.status === "COMPLETED" ? (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-                    {/* Score Card */}
-                    <Card className="p-8 lg:col-span-1 bg-white/[0.02] border-white/10 flex flex-col items-center justify-center text-center">
-                        <h3 className="text-lg font-medium text-zinc-400 mb-6">Overall Risk Score</h3>
-                        <div className="relative w-48 h-48 flex items-center justify-center">
-                            <svg className="w-full h-full transform -rotate-90">
-                                <circle cx="96" cy="96" r="80" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-white/5" />
-                                <circle
-                                    cx="96" cy="96" r="80"
-                                    stroke="currentColor"
-                                    strokeWidth="12"
-                                    fill="transparent"
-                                    strokeDasharray="502"
-                                    strokeDashoffset={502 - (502 * (data.riskScore || 0)) / 100}
-                                    className={`${getScoreColor(data.riskScore || 0)} transition-all duration-1000 ease-in-out`}
-                                    strokeLinecap="round"
-                                />
-                            </svg>
-                            <div className="absolute flex flex-col items-center justify-center">
-                                <span className={`text-6xl font-black ${getScoreColor(data.riskScore || 0)}`}>
-                                    {Math.round(data.riskScore || 0)}
-                                </span>
-                                <span className="text-sm font-medium text-zinc-500 mt-1">out of 100</span>
-                            </div>
+            <div className="max-w-[1600px] mx-auto z-10 relative">
+                {/* Header Area */}
+                <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+                        <div className="flex items-center gap-3 mb-3">
+                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase border ${data.status === 'COMPLETED' ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-primary/30 bg-primary/10 text-primary'
+                                }`}>
+                                {data.status === 'COMPLETED' ? 'Verified Analysis' : 'Processing Live'}
+                            </span>
+                            <span className="text-zinc-600 text-[10px] tracking-widest uppercase">ID: {String(data.id).slice(0, 8)}</span>
                         </div>
-                        <p className="mt-6 text-zinc-300">
-                            {(data.riskScore || 0) > 60 ? "High risk detected. Proceed with caution and consider negotiating." : "Generally safe, but review highlighted terms."}
+                        <h1 className="text-4xl font-semibold tracking-tight text-foreground mb-2">{data.title}</h1>
+                        <p className="text-zinc-400 font-light max-w-xl">
+                            Our AI has completed a comprehensive audit of your legal instrument. Review the identified architectural risks and recommendations below.
                         </p>
-                    </Card>
+                    </motion.div>
 
-                    {/* Details Tabs */}
-                    <Card className="lg:col-span-2 bg-white/[0.02] border-white/10 p-0 overflow-hidden">
-                        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-                            <div className="px-6 pt-6 pb-2 border-b border-white/10">
-                                <TabsList className="bg-white/5 border border-white/10 p-1 w-full sm:w-auto h-12">
-                                    <TabsTrigger value="overview" className="data-[state=active]:bg-white/10 px-6">Risky Clauses</TabsTrigger>
-                                    <TabsTrigger value="negotiate" className="data-[state=active]:bg-blue-600 px-6">Negotiation Message</TabsTrigger>
-                                </TabsList>
-                            </div>
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex gap-4">
+                        <Button variant="outline" className="glass-pane border-zinc-200 dark:border-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-500 dark:text-zinc-300 rounded-xl h-12 px-6">
+                            <Download className="mr-2 h-4 w-4" /> Export Audit
+                        </Button>
+                        <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl h-12 px-6 shadow-lg shadow-primary/20">
+                            <ShieldCheck className="mr-2 h-4 w-4" /> Certified View
+                        </Button>
+                    </motion.div>
+                </header>
 
-                            <div className="flex-1 p-6 overflow-y-auto max-h-[600px] custom-scrollbar">
-                                <TabsContent value="overview" className="mt-0 space-y-6">
-                                    {data.clauses.map((clause, idx) => (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.1 }}
-                                            key={clause.id}
-                                            className="p-6 rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden"
+                {data.status === 'COMPLETED' ? (
+                    <div className="grid grid-cols-12 gap-8">
+                        {/* Left Column: Risk Gauge & Clauses */}
+                        <section className="col-span-12 lg:col-span-4 space-y-8">
+                            {/* Risk Gauge Card */}
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="glass-pane p-10 rounded-[2.5rem] flex flex-col items-center text-center relative overflow-hidden group"
+                            >
+                                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+                                <h3 className="text-xs font-bold tracking-[0.25em] text-zinc-500 uppercase mb-8">Architectural Risk Score</h3>
+
+                                <div className="relative w-56 h-56 flex items-center justify-center">
+                                    {/* Outer Ring Effect */}
+                                    <motion.div
+                                        animate={{ rotate: 360 }}
+                                        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                                        className="absolute inset-0 rounded-full border border-dashed border-white/5"
+                                    />
+
+                                    <svg className="w-full h-full transform -rotate-90">
+                                        <circle cx="112" cy="112" r="95" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                                        <motion.circle
+                                            cx="112" cy="112" r="95"
+                                            stroke="currentColor"
+                                            strokeWidth="8"
+                                            fill="transparent"
+                                            strokeDasharray="597"
+                                            initial={{ strokeDashoffset: 597 }}
+                                            animate={{ strokeDashoffset: 597 - (597 * (data.riskScore || 0)) / 100 }}
+                                            transition={{ duration: 1.5, ease: "circOut", delay: 0.5 }}
+                                            className={`${(data.riskScore || 0) > 60 ? 'text-red-400' : 'text-primary'}`}
+                                            strokeLinecap="round"
+                                        />
+                                    </svg>
+                                    <div className="absolute flex flex-col items-center">
+                                        <motion.span
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 1 }}
+                                            className="text-7xl font-bold tracking-tighter text-foreground"
                                         >
-                                            <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-xl text-xs font-bold
-                        ${clause.riskLevel === 'CRITICAL' ? 'bg-red-500/20 text-red-400' :
-                                                    clause.riskLevel === 'HIGH' ? 'bg-orange-500/20 text-orange-400' :
-                                                        'bg-yellow-500/20 text-yellow-400'}
-                      `}>
-                                                {clause.riskLevel} RISK
-                                            </div>
-
-                                            <div className="flex items-center gap-3 mb-4">
-                                                <AlertTriangle className={`h-5 w-5 ${clause.riskLevel === 'CRITICAL' ? 'text-red-400' : 'text-orange-400'}`} />
-                                                <h4 className="text-lg font-semibold">{clause.clauseType}</h4>
-                                            </div>
-
-                                            <div className="grid md:grid-cols-2 gap-6">
-                                                <div>
-                                                    <p className="text-sm font-medium text-zinc-500 mb-2 flex items-center gap-1">
-                                                        <FileIcon className="h-4 w-4" /> Original Legal Text
-                                                    </p>
-                                                    <p className="text-zinc-300 text-sm italic border-l-2 border-white/10 pl-3 py-1">
-                                                        "{clause.originalText}"
-                                                    </p>
-                                                </div>
-                                                <div className="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20">
-                                                    <p className="text-sm font-medium text-blue-400 mb-2 flex items-center gap-1">
-                                                        <Info className="h-4 w-4" /> Simple Explanation
-                                                    </p>
-                                                    <p className="text-blue-100 text-sm">
-                                                        {clause.simplifiedText || "Simplifying..."}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                    {data.clauses.length === 0 && (
-                                        <p className="text-center py-10 text-zinc-500">No risky clauses detected.</p>
-                                    )}
-                                </TabsContent>
-
-                                <TabsContent value="negotiate" className="mt-0 h-full">
-                                    <div className="h-full flex flex-col">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-xl font-semibold flex items-center gap-2">
-                                                <MessageSquare className="h-5 w-5 text-blue-400" />
-                                                Suggested Message
-                                            </h3>
-                                            <Button variant="secondary" size="sm" onClick={copyToClipboard} className="gap-2">
-                                                <Copy className="h-4 w-4" />
-                                                Copy to Clipboard
-                                            </Button>
-                                        </div>
-                                        <div className="flex-1 bg-white/5 border border-white/10 p-6 rounded-2xl">
-                                            <pre className="whitespace-pre-wrap font-sans text-zinc-300 leading-relaxed text-sm">
-                                                {data.negotiationMsg || "Generating message..."}
-                                            </pre>
-                                        </div>
+                                            {Math.round(data.riskScore || 0)}
+                                        </motion.span>
+                                        <span className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase mt-2">Score / 100</span>
                                     </div>
-                                </TabsContent>
+                                </div>
+
+                                <div className="mt-10 px-4">
+                                    <p className="text-zinc-700 dark:text-zinc-200 font-medium mb-1">
+                                        {(data.riskScore || 0) > 60 ? "Elevated Exposure" : "Standard Exposure"}
+                                    </p>
+                                    <p className="text-zinc-500 text-xs font-light leading-relaxed">
+                                        AI identified {data.clauses.length} significant clauses requiring professional scrutiny.
+                                    </p>
+                                </div>
+                            </motion.div>
+
+                            {/* Clause List List */}
+                            <div className="space-y-4">
+                                <h3 className="text-[10px] font-bold tracking-[0.3em] text-zinc-500 uppercase ml-4">Identified Clauses</h3>
+                                <div className="space-y-3">
+                                    {data.clauses.map((clause, idx) => (
+                                        <motion.button
+                                            key={clause.id}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: idx * 0.1 }}
+                                            onClick={() => setSelectedClause(clause)}
+                                            className={`w-full text-left p-6 rounded-2xl transition-all border duration-300 group
+                        ${selectedClause?.id === clause.id
+                                                    ? 'glass-pane border-primary/40 bg-zinc-100/50 dark:bg-primary/5 glow-indigo'
+                                                    : 'bg-zinc-50/50 dark:bg-white/[0.02] border-zinc-100 dark:border-white/5 hover:border-zinc-200 dark:hover:border-white/10 hover:bg-zinc-100 dark:hover:bg-white/[0.04]'}
+                      `}
+                                        >
+                                            <div className="flex justify-between items-start mb-2">
+                                                <span className={`text-[10px] font-bold tracking-widest uppercase py-1 ${getRiskColor(clause.riskLevel)}`}>
+                                                    {clause.riskLevel} Risk
+                                                </span>
+                                                {selectedClause?.id === clause.id && (
+                                                    <motion.div layoutId="active-indicator" className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                                )}
+                                            </div>
+                                            <h4 className="text-foreground font-medium mb-1 flex items-center gap-2 font-semibold">
+                                                {clause.clauseType}
+                                                <ChevronRight className={`h-4 w-4 transition-transform ${selectedClause?.id === clause.id ? 'translate-x-1' : 'opacity-0'}`} />
+                                            </h4>
+                                            <p className="text-zinc-500 text-xs truncate font-light italic">"{clause.originalText.slice(0, 60)}..."</p>
+                                        </motion.button>
+                                    ))}
+                                </div>
                             </div>
-                        </Tabs>
-                    </Card>
-                </div>
-            ) : (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <RefreshCw className="h-16 w-16 text-blue-500 animate-spin mb-6" />
-                    <h2 className="text-2xl font-bold mb-2">Analyzing your document...</h2>
-                    <p className="text-zinc-400 max-w-md mx-auto">
-                        Our legal transformer models are scanning your agreement for hidden risks. This usually takes 30-60 seconds.
-                    </p>
-                </div>
-            )}
-        </div>
+                        </section>
+
+                        {/* Right Column: Inspection Panel */}
+                        <section className="col-span-12 lg:col-span-8 flex flex-col gap-8">
+                            <AnimatePresence mode="wait">
+                                {selectedClause ? (
+                                    <motion.div
+                                        key={selectedClause.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+                                        className="glass-pane p-12 rounded-[2.5rem] flex-1 relative overflow-hidden"
+                                    >
+                                        <div className="flex items-center gap-4 mb-10">
+                                            <div className={`p-4 rounded-2xl flex items-center justify-center bg-white/5 border border-white/10`}>
+                                                <Zap className={`h-6 w-6 ${getRiskColor(selectedClause.riskLevel)}`} />
+                                            </div>
+                                            <div>
+                                                <h2 className="text-2xl font-semibold text-foreground tracking-tight">{selectedClause.clauseType}</h2>
+                                                <p className="text-zinc-500 text-sm font-light">Deep inspection report & simplification</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-12">
+                                            <div className="space-y-6">
+                                                <section>
+                                                    <h4 className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase mb-4 flex items-center gap-2">
+                                                        <FileIcon className="h-3 w-3" /> Original Repository Text
+                                                    </h4>
+                                                    <div className="bg-black/20 p-6 rounded-2xl border border-white/5 font-serif text-zinc-400 text-sm leading-relaxed italic">
+                                                        "{selectedClause.originalText}"
+                                                    </div>
+                                                </section>
+
+                                                <div className="pt-4 grid grid-cols-2 gap-4">
+                                                    <div className="glass-pane p-4 rounded-xl border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/5">
+                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase block mb-1">AI Confidence</span>
+                                                        <span className="text-lg font-semibold text-foreground">98.4%</span>
+                                                    </div>
+                                                    <div className="glass-pane p-4 rounded-xl border-zinc-200 dark:border-white/5 bg-zinc-50 dark:bg-white/5">
+                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase block mb-1">Precedent Match</span>
+                                                        <span className="text-lg font-semibold text-foreground">High</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-8">
+                                                <section className="bg-primary/5 p-8 rounded-[2rem] border border-primary/20 relative overflow-hidden">
+                                                    <div className="absolute top-0 right-0 p-4 opacity-10">
+                                                        <ShieldCheck className="h-20 w-20 text-primary" />
+                                                    </div>
+                                                    <h4 className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-6 flex items-center gap-2">
+                                                        Calm Interpretation
+                                                    </h4>
+                                                    <p className="text-primary dark:text-blue-100 text-lg font-light leading-relaxed">
+                                                        {selectedClause.simplifiedText || "Interpretation in progress..."}
+                                                    </p>
+                                                </section>
+
+                                                <section className="px-4">
+                                                    <h4 className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase mb-4">Strategic recommendation</h4>
+                                                    <ul className="space-y-3">
+                                                        <li className="flex items-start gap-3 text-sm text-zinc-400">
+                                                            <div className="mt-1.5 h-1 w-1 rounded-full bg-primary" />
+                                                            Advise counter-party to limit cap to 1x annual fees.
+                                                        </li>
+                                                        <li className="flex items-start gap-3 text-sm text-zinc-400">
+                                                            <div className="mt-1.5 h-1 w-1 rounded-full bg-primary" />
+                                                            Strike out the auto-renewal clause for multi-year terms.
+                                                        </li>
+                                                    </ul>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <div className="glass-pane rounded-[2.5rem] flex-1 flex flex-col items-center justify-center text-center p-12 opacity-50">
+                                        <AIPresence status="idle" className="mb-6 opacity-30" />
+                                        <p className="text-zinc-500 font-light tracking-widest uppercase text-xs">Awaiting Clause Selection</p>
+                                    </div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Negotiation Drawer Mock (as index) */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="glass-pane p-10 rounded-[2.5rem] relative overflow-hidden"
+                            >
+                                <div className="flex items-center justify-between mb-8">
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-foreground mb-1">Negotiation Strategy</h3>
+                                        <p className="text-zinc-500 text-sm font-light">AI-generated draft for resolution</p>
+                                    </div>
+                                    <Button onClick={copyNegotiation} className="bg-white/5 hover:bg-white/10 text-white rounded-xl gap-2 border border-white/10">
+                                        <Copy className="h-4 w-4" /> Copy Protocol
+                                    </Button>
+                                </div>
+                                <div className="bg-black/40 p-1 rounded-2xl border border-white/5">
+                                    <pre className="whitespace-pre-wrap font-sans text-zinc-400 p-8 text-sm leading-relaxed max-h-48 overflow-y-auto custom-scrollbar italic">
+                                        {data.negotiationMsg || "Strategic generation in progress..."}
+                                    </pre>
+                                </div>
+                            </motion.div>
+                        </section>
+                    </div>
+                ) : (
+                    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center">
+                        <AIPresence status="analyzing" className="mb-8" />
+                        <h2 className="text-2xl font-semibold mb-4 text-foreground">Engaging Intelligence</h2>
+                        <p className="text-zinc-500 max-w-md font-light leading-relaxed">
+                            Our neural models are mapping the legal architecture and calculating liability surfaces. This process maintains 256-bit isolation.
+                        </p>
+                    </div>
+                )}
+            </div>
+        </main>
     );
 }

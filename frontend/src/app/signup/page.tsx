@@ -55,69 +55,70 @@ export default function SignupPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
+        <main className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-background">
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-[-5%] left-[-5%] w-[30%] h-[30%] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-full max-w-md z-10"
             >
-                <div className="bg-white/[0.02] border border-white/10 p-8 sm:p-10 rounded-3xl backdrop-blur-xl shadow-2xl">
+                <div className="glass-pane p-8 sm:p-10 rounded-[2.5rem]">
                     <div className="text-center mb-10">
-                        <h1 className="text-3xl font-bold mb-3 tracking-tight">Create Account</h1>
-                        <p className="text-zinc-400">Start analyzing agreements for free.</p>
+                        <h1 className="text-3xl font-bold mb-3 tracking-tight text-foreground dark:text-[#E8E9EB]">Create Account</h1>
+                        <p className="text-muted-foreground dark:text-[#A6A9B0] font-light">Start analyzing agreements for free.</p>
                     </div>
 
                     <form onSubmit={handleSignup} className="space-y-5">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="firstName">First Name</Label>
+                                <Label htmlFor="firstName" className="text-xs font-bold tracking-widest text-muted-foreground dark:text-[#A6A9B0] uppercase ml-1">First Name</Label>
                                 <Input
                                     id="firstName"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    className="h-11 bg-black/50 border-white/10"
+                                    className="h-12 bg-muted/50 dark:bg-[#0E0F12]/40 border-border dark:border-white/5 text-foreground dark:text-[#E8E9EB] rounded-2xl focus:ring-primary/50"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="lastName">Last Name</Label>
+                                <Label htmlFor="lastName" className="text-xs font-bold tracking-widest text-muted-foreground dark:text-[#A6A9B0] uppercase ml-1">Last Name</Label>
                                 <Input
                                     id="lastName"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    className="h-11 bg-black/50 border-white/10"
+                                    className="h-12 bg-muted/50 dark:bg-[#0E0F12]/40 border-border dark:border-white/5 text-foreground dark:text-[#E8E9EB] rounded-2xl focus:ring-primary/50"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
+                            <Label htmlFor="email" className="text-xs font-bold tracking-widest text-muted-foreground dark:text-[#A6A9B0] uppercase ml-1">Email Address</Label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground dark:text-[#A6A9B0]" />
                                 <Input
                                     id="email"
                                     type="email"
                                     placeholder="name@company.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="pl-10 h-11 bg-black/50 border-white/10"
+                                    className="pl-12 h-12 bg-muted/50 dark:bg-[#0E0F12]/40 border-border dark:border-white/5 text-foreground dark:text-[#E8E9EB] rounded-2xl focus:ring-primary/50 placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-600"
                                     required
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password" className="text-xs font-bold tracking-widest text-muted-foreground dark:text-[#A6A9B0] uppercase ml-1">Secure Password</Label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground dark:text-[#A6A9B0]" />
                                 <Input
                                     id="password"
                                     type="password"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="pl-10 h-11 bg-black/50 border-white/10"
+                                    className="pl-12 h-12 bg-muted/50 dark:bg-[#0E0F12]/40 border-border dark:border-white/5 text-foreground dark:text-[#E8E9EB] rounded-2xl focus:ring-primary/50 placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-600"
                                     required
                                 />
                             </div>
@@ -125,23 +126,23 @@ export default function SignupPage() {
 
                         <Button
                             type="submit"
-                            className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 mt-4"
+                            className="w-full h-14 text-lg bg-primary hover:bg-[#D9A441] text-[#0E0F12] rounded-2xl mt-4 font-semibold shadow-xl shadow-primary/20 transition-all duration-500"
                             disabled={isLoading}
                         >
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Creating Account...
+                                    Creating Expert Account...
                                 </>
                             ) : (
-                                "Create Account"
+                                "Create Expert Account"
                             )}
                         </Button>
                     </form>
 
-                    <div className="mt-8 text-center text-sm text-zinc-400">
+                    <div className="mt-8 text-center text-xs font-bold tracking-[0.1em] text-muted-foreground dark:text-[#A6A9B0] uppercase">
                         Already have an account?{" "}
-                        <Link href="/login" className="text-blue-400 hover:text-blue-300 font-medium inline-flex items-center group">
+                        <Link href="/login" className="text-primary hover:text-foreground dark:hover:text-white transition-all inline-flex items-center group ml-1">
                             Sign In
                             <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
                         </Link>
