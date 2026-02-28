@@ -17,11 +17,17 @@ app = FastAPI(
 )
 
 # Configure CORS - open to all origins since auth uses JWT headers, not cookies
+# Configure CORS for production frontend
+origins = [
+    "http://localhost:3000",
+    "https://fine-print-ai-rouge.vercel.app"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
