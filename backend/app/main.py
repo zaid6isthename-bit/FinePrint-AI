@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
+import os
 from app.db.prisma import connect_db, disconnect_db
 from app.api.endpoints import auth, documents
 
@@ -52,4 +53,6 @@ async def root():
     return {"message": "Welcome to the FinePrint AI API"}
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 8000))
+    # Note: Use reload=False in production, but here we stay consistent with dev
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
