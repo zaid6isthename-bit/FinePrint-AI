@@ -1,5 +1,5 @@
 import logging
-from transformers import pipeline
+# transformers is lazily imported inside load_model
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,7 @@ class LegalJargonSimplifier:
         if self.simplifier is None:
             logger.info(f"Loading Legal Simplifier ({self.model_name})...")
             # Using basic summarization pipeline as proxy for simplification
+            from transformers import pipeline
             self.simplifier = pipeline("summarization", model=self.model_name)
             logger.info("Simplifier loaded.")
 

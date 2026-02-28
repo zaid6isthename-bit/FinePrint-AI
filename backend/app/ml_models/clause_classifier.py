@@ -1,5 +1,5 @@
 import logging
-from transformers import pipeline
+# transformers is lazily imported inside load_model to speed up server boot
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +22,7 @@ class LegalClauseClassifier:
     def load_model(self):
         if self.classifier is None:
             logger.info(f"Loading Legal Clause Classifier ({self.model_name})...")
+            from transformers import pipeline
             self.classifier = pipeline("zero-shot-classification", model=self.model_name)
             logger.info("Classifier loaded.")
 

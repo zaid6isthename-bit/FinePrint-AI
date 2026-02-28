@@ -1,5 +1,5 @@
 import logging
-from transformers import pipeline
+# transformers is lazily imported inside load_model
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ class RiskScorer:
     def load_model(self):
         if self.scorer is None:
             logger.info(f"Loading Risk Scorer ({self.model_name})...")
+            from transformers import pipeline
             self.scorer = pipeline("sentiment-analysis", model=self.model_name)
             logger.info("Scorer loaded.")
 

@@ -1,5 +1,5 @@
-import fitz  # PyMuPDF
 import io
+# fitz (PyMuPDF) is lazily imported in extract_text
 
 class PDFExtractor:
     @staticmethod
@@ -9,6 +9,7 @@ class PDFExtractor:
         """
         text = ""
         try:
+            import fitz  # Lazy import PyMuPDF
             doc = fitz.open(stream=file_bytes, filetype="pdf")
             for page in doc:
                 text += page.get_text()
