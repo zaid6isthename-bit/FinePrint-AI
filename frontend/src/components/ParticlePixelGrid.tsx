@@ -118,7 +118,7 @@ export default function ParticlePixelGrid() {
                             color: isHovered ? "#C8A96A" : "rgba(200, 169, 106, 0.4)",
                             textShadow: isHovered && mouseInfluence > 0.7 ? '0 0 8px rgba(200, 169, 106, 0.5), 0 0 15px rgba(200, 169, 106, 0.3)' : 'none',
                             '--rain-delay': `${point.rainDelay}s`
-                        } as any}
+                        } as React.CSSProperties}
                     >
                         {point.val}
                     </div>

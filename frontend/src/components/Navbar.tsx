@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Github, LogOut, Shield, Layout, PlusCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "./ui/button";
-import { motion } from "framer-motion";
 import { ModeToggle } from "./ModeToggle";
 
 export default function Navbar() {

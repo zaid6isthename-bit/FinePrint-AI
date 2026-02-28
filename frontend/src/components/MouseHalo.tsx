@@ -16,9 +16,6 @@ export default function MouseHalo() {
     const headY = useMotionValue(-lensOffset);
 
     // Optimized trail physics chain (Stable count)
-    // Tighter springs for the lens to feel precise
-    const s1x = useSpring(headX, { damping: 20, stiffness: 450, mass: 0.1 });
-    const s1y = useSpring(headY, { damping: 20, stiffness: 450, mass: 0.1 });
     // Slightly more lag for the trail parts
     const s2x = useSpring(headX, { damping: 25, stiffness: 350, mass: 0.2 });
     const s2y = useSpring(headY, { damping: 25, stiffness: 350, mass: 0.2 });
