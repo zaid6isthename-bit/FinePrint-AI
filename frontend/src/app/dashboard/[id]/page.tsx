@@ -7,7 +7,7 @@ import {
     Zap, ExternalLink, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -41,15 +41,7 @@ export default function Dashboard() {
     const { toast } = useToast();
     const router = useRouter();
 
-    useEffect(() => {
-        if (!authLoading && !user) {
-            router.push("/login");
-            return;
-        }
-        if (id) fetchData();
-    }, [id, user, authLoading]);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const response = await api.get(`/documents/${id}`);
             setData(response.data);
@@ -64,7 +56,15 @@ export default function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id, selectedClause]);
+
+    useEffect(() => {
+        if (!authLoading && !user) {
+            router.push("/login");
+            return;
+        }
+        if (id) fetchData();
+    }, [id, user, authLoading, router, fetchData]);
 
     const copyNegotiation = () => {
         if (data?.negotiationMsg) {
