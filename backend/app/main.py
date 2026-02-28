@@ -52,6 +52,7 @@ async def root():
     return {"message": "Welcome to the FinePrint AI API"}
 
 if __name__ == "__main__":
+    import os
     port = int(os.environ.get("PORT", 8000))
-    # Note: Use reload=False in production, but here we stay consistent with dev
-    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
+    # Disable reload in production to avoid file watcher crashes that prevent port binding
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=False)
