@@ -2,9 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    Copy, AlertTriangle, Info, MessageSquare, Download, CheckCircle2,
-    File as FileIcon, Loader2, RefreshCw, ArrowRight, ShieldCheck,
-    Zap, ExternalLink, ChevronRight
+    Copy, Download, File as FileIcon, ShieldCheck,
+    Zap, ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useCallback } from "react";
@@ -215,7 +214,7 @@ export default function Dashboard() {
                                                 {clause.clauseType}
                                                 <ChevronRight className={`h-4 w-4 transition-transform ${selectedClause?.id === clause.id ? 'translate-x-1' : 'opacity-0'}`} />
                                             </h4>
-                                            <p className="text-zinc-500 text-xs truncate font-light italic">"{clause.originalText.slice(0, 60)}..."</p>
+                                            <p className="text-zinc-500 text-xs truncate font-light italic">{`"${clause.originalText.slice(0, 60)}..."`}</p>
                                         </motion.button>
                                     ))}
                                 </div>
@@ -250,7 +249,7 @@ export default function Dashboard() {
                                                         <FileIcon className="h-3 w-3" /> Original Repository Text
                                                     </h4>
                                                     <div className="bg-black/20 p-6 rounded-2xl border border-white/5 font-serif text-zinc-400 text-sm leading-relaxed italic">
-                                                        "{selectedClause.originalText}"
+                                                        {`"${selectedClause.originalText}"`}
                                                     </div>
                                                 </section>
 

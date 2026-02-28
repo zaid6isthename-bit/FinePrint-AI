@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, ArrowRight, Loader2, Calendar, Shield, Clock } from "lucide-react";
+import { FileText, ArrowRight, Calendar, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useMemo } from "react";
-import { ShieldAlert, FileText, CheckCircle2, Lock, Scale, Zap, Info, AlertTriangle } from "lucide-react";
+import { ShieldAlert, Scale, Zap, Info, AlertTriangle } from "lucide-react";
 
 const PHRASES = [
     "Mapping contractual obligations...",
@@ -26,7 +26,7 @@ const RISK_NOTES = [
 
 export function AnalysisTheatre() {
     const [phraseIdx, setPhraseIdx] = useState(0);
-    const [activeTag, setActiveTag] = useState<{ text: string; icon: any; color: string; bgColor: string; borderColor: string } | null>(null);
+    const [activeTag, setActiveTag] = useState<{ text: string; icon: React.ElementType; color: string; bgColor: string; borderColor: string } | null>(null);
     const [riskNote, setRiskNote] = useState<string | null>(null);
     const [highlightedClause, setHighlightedClause] = useState<number | null>(null);
     const [pulseLines, setPulseLines] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileIcon, Loader2, Link as LinkIcon, Sparkles, Lock } from "lucide-react";
+import { Upload, FileIcon, Loader2, Sparkles, Lock } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ export default function UploadPage() {
     const [title, setTitle] = useState("");
     const [isUploading, setIsUploading] = useState(false);
     const [step, setStep] = useState<"upload" | "analyzing" | "completed">("upload");
-    const [isHovered, setIsHovered] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
     const { user, isLoading: authLoading } = useAuth();
@@ -32,7 +31,7 @@ export default function UploadPage() {
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
-            setFile(acceptedFiles[0]);
+            setFile(acceptedFiles[acceptedFiles.length - 1] || acceptedFiles[0]);
         }
     }, []);
 
@@ -73,12 +72,13 @@ export default function UploadPage() {
                 }, 1500);
             }, 8000);
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             setStep("upload");
             setIsUploading(false);
+            const message = (error as any).response?.data?.detail || "Could not upload the document. Please try again.";
             toast({
                 title: "Upload Failed",
-                description: error.response?.data?.detail || "Could not upload the document. Please try again.",
+                description: message,
                 variant: "destructive",
             });
         }
@@ -131,8 +131,6 @@ export default function UploadPage() {
 
                             <div
                                 {...getRootProps()}
-                                onMouseEnter={() => setIsHovered(true)}
-                                onMouseLeave={() => setIsHovered(false)}
                                 className={`group relative border-2 border-dashed rounded-[2.5rem] p-16 text-center cursor-pointer transition-all duration-700
                   ${isDragActive ? "border-primary bg-primary/5 scale-[1.02] shadow-2xl shadow-primary/10" : "border-white/5 hover:border-primary/50 hover:bg-white/[0.02]"}
                   ${file ? "bg-[#1C1F26]/30 border-solid border-primary/20" : ""}

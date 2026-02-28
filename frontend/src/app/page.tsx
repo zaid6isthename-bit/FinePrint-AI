@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, FileText, CheckCircle2, Lock, Sparkles, Scale } from "lucide-react";
+import { ArrowRight, ShieldCheck, FileText, CheckCircle2, Lock, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AIPresence } from "@/components/AIPresence";

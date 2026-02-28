@@ -18,7 +18,6 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
     const { toast } = useToast();
-    const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,10 +30,11 @@ export default function LoginPage() {
                 title: "Login Successful",
                 description: "Welcome back to FinePrint AI.",
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = (error as any).response?.data?.detail || "Invalid email or password.";
             toast({
                 title: "Login Failed",
-                description: error.response?.data?.detail || "Invalid email or password.",
+                description: message,
                 variant: "destructive",
             });
         } finally {
@@ -111,7 +111,7 @@ export default function LoginPage() {
                     </form>
 
                     <div className="mt-8 text-center text-xs font-bold tracking-[0.1em] text-muted-foreground dark:text-[#A6A9B0] uppercase">
-                        Don't have an account?{" "}
+                        Don&apos;t have an account?{" "}
                         <Link href="/signup" className="text-primary hover:text-foreground dark:hover:text-white transition-all inline-flex items-center group ml-1">
                             Create one
                             <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,6 @@ export default function SignupPage() {
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
     const { toast } = useToast();
-    const router = useRouter();
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,7 +27,7 @@ export default function SignupPage() {
 
         try {
             // 1. Create account
-            const signupResponse = await api.post("/auth/signup", {
+            await api.post("/auth/signup", {
                 email,
                 password,
                 firstName,
@@ -43,10 +42,11 @@ export default function SignupPage() {
                 title: "Account Created",
                 description: "Welcome to FinePrint AI!",
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = (error as any).response?.data?.detail || "Something went wrong. Please try again.";
             toast({
                 title: "Signup Failed",
-                description: error.response?.data?.detail || "Something went wrong. Please try again.",
+                description: message,
                 variant: "destructive",
             });
         } finally {
