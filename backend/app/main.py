@@ -15,7 +15,17 @@ app = FastAPI(
     description="Backend API for FinePrint AI - Legal Agreement Risk Analyzer",
     version="1.0.0"
 )
+from fastapi.responses import Response
+from fastapi.requests import Request
 
+@app.options("/{full_path:path}")
+async def preflight_handler(request: Request):
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = request.headers.get("origin", "*")
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 # Configure CORS - open to all origins since auth uses JWT headers, not cookies
 # Configure CORS for production frontend
 origins = [
