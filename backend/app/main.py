@@ -32,7 +32,11 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     logger.info("Starting up FinePrint AI Backend...")
-    await connect_db()
+    try:
+        await connect_db()
+    except Exception as e:
+        logger.error(f"Failed to connect to DB on startup: {e}")
+        logger.warning("Continuing startup for health check compatibility...")
 
 @app.on_event("shutdown")
 async def shutdown():
