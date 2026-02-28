@@ -7,11 +7,12 @@ db = Prisma(auto_register=True)
 
 async def connect_db():
     try:
-        await db.connect()
-        logger.info("Successfully connected to the PostgreSQL database.")
+        if not db.is_connected():
+            await db.connect()
+            logger.info("Successfully connected to the PostgreSQL database.")
     except Exception as e:
         logger.error(f"Error connecting to database: {e}")
-        raise e
+        # We do not re-raise here to prevent crashing the background initialization task
 
 async def disconnect_db():
     try:
