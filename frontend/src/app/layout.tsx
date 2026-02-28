@@ -4,6 +4,8 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/context/AuthContext";
+import MouseHalo from "@/components/MouseHalo";
+import ParticlePixelGrid from "@/components/ParticlePixelGrid";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +31,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
+            <ParticlePixelGrid />
+            <MouseHalo />
             <Navbar />
             {children}
             <Toaster />
