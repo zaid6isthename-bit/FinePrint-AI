@@ -16,14 +16,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS - allow Vercel deployments and local dev
-import re
-
+# Configure CORS - open to all origins since auth uses JWT headers, not cookies
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://.*\.vercel\.app|http://localhost:\d+",
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 
