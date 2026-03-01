@@ -1,6 +1,6 @@
 import asyncio
 from fastapi import UploadFile
-from app.db.prisma import db
+from app.db.prisma import prisma
 from app.ml_models.text_extractor import PDFExtractor
 from app.ml_models.document_splitter import DocumentSplitter
 from app.ml_models.clause_classifier import clause_classifier

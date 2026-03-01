@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File, BackgroundTasks, HTTPException, status
 from typing import List
 from app.api.deps import get_current_user
-from app.db.prisma import db
+from app.db.prisma import prisma
 from app.schemas.document import DocumentResponse, ClauseResponse
 from app.services.document_service import DocumentService
 from app.schemas.user import UserResponse
