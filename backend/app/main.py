@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
 import os
-from app.api.endpoints import auth, documents
+from app.api import auth, documents
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
