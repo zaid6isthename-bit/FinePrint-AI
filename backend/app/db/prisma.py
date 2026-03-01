@@ -1,19 +1,19 @@
 from prisma import Prisma
 import asyncio
 
-prisma = Prisma()
+db = Prisma()
 
 async def connect_db():
     for _ in range(5):
         try:
-            await prisma.connect()
-            print("✅ Connected to database")
+            await db.connect()
+            print("✅ Connected to DB")
             return
         except Exception as e:
-            print("❌ DB connection failed, retrying...", e)
+            print("Retrying DB connection...", e)
             await asyncio.sleep(2)
 
 async def disconnect_db():
-    if prisma.is_connected():
-        await prisma.disconnect()
-        print("Disconnected from database")
+    if db.is_connected():
+        await db.disconnect()
+        print("❌ Disconnected DB")
