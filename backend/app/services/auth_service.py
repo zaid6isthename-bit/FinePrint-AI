@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.schemas.user import UserCreate, UserLogin
 from app.utils.auth import get_password_hash, verify_password, create_access_token
-from app.db.prisma import db
+from app.db.prisma import prisma
+import asyncio
 from datetime import timedelta
 from app.core.config import settings
 
@@ -10,7 +11,10 @@ class AuthService:
     @staticmethod
     async def create_user(user_in: UserCreate):
         # Check if user exists
-        existing_user = await db.user.find_unique(where={"email": user_in.email})
+        if not prisma.is_connected():
+            await prisma.connect()
+
+        existing_user = await prisma.user.find_unique(where={"email": user_in.email})
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -19,7 +23,7 @@ class AuthService:
         
         hashed_password = get_password_hash(user_in.password)
         
-        new_user = await db.user.create(
+        new_user = await prisma.user.create(
             data={
                 "email": user_in.email,
                 "hashedPassword": hashed_password,
@@ -31,7 +35,10 @@ class AuthService:
 
     @staticmethod
     async def authenticate_user(user_in: UserLogin):
-        user = await db.user.find_unique(where={"email": user_in.email})
+        if not prisma.is_connected():
+            await prisma.connect()
+
+        user = await prisma.user.find_unique(where={"email": user_in.email})
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
         if not verify_password(user_in.password, user.hashedPassword):
