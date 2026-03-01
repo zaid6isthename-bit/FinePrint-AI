@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File, BackgroundTasks, HTTPException, status
 from typing import List
 from app.api.deps import get_current_user
-from app.db.prisma import prisma
+from app.db.prisma import db
 from app.schemas.document import DocumentResponse, ClauseResponse
 from app.services.document_service import DocumentService
 from app.schemas.user import UserResponse
@@ -21,7 +21,7 @@ async def upload_document(
     file_bytes = await file.read()
     
     # Create initial document record
-    document = await db.document.create(
+    document = await prisma.document.create(
         data={
             "title": title,
             "filename": file.filename,
@@ -47,7 +47,7 @@ async def upload_document(
 
 @router.get("/history", response_model=List[DocumentResponse])
 async def get_history(current_user: UserResponse = Depends(get_current_user)):
-    documents = await db.document.find_many(
+    documents = await prisma.document.find_many(
         where={"userId": current_user.id},
         order={"uploadDate": "desc"}
     )
@@ -67,7 +67,7 @@ async def get_history(current_user: UserResponse = Depends(get_current_user)):
 
 @router.get("/{document_id}", response_model=DocumentResponse)
 async def get_document(document_id: str, current_user: UserResponse = Depends(get_current_user)):
-    document = await db.document.find_unique(
+    document = await prisma.document.find_unique(
         where={"id": document_id},
         include={"clauses": True}
     )

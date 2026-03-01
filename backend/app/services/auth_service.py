@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.schemas.user import UserCreate, UserLogin
 from app.utils.auth import get_password_hash, verify_password, create_access_token
-from app.db.prisma import prisma
+from app.db.prisma import db
 import asyncio
 from datetime import timedelta
 from app.core.config import settings
