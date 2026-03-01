@@ -34,10 +34,18 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     logger.info("Starting up FinePrint AI Backend...")
-    # Fire and forget the database connection to ensure immediate port binding for Render health checks
+
     import asyncio
-    asyncio.create_task(connect_db())
-    logger.info("Web server initialization complete. Port binding should occur now.")
+
+    loop = asyncio.get_event_loop()
+
+    # Delay DB connection so server can bind port first
+    loop.call_later(
+        5,
+        lambda: asyncio.create_task(connect_db())
+    )
+
+    logger.info("Startup complete. DB connection scheduled.")
 
 @app.on_event("shutdown")
 async def shutdown():

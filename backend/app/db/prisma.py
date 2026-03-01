@@ -5,14 +5,20 @@ logger = logging.getLogger(__name__)
 
 db = Prisma(auto_register=True)
 
+from prisma import Prisma
+import asyncio
+
+prisma = Prisma()
+
 async def connect_db():
-    try:
-        if not db.is_connected():
-            await db.connect()
-            logger.info("Successfully connected to the PostgreSQL database.")
-    except Exception as e:
-        logger.error(f"Error connecting to database: {e}")
-        # We do not re-raise here to prevent crashing the background initialization task
+    for _ in range(5):
+        try:
+            await prisma.connect()
+            print("✅ Connected to database")
+            return
+        except Exception as e:
+            print("❌ DB connection failed, retrying...", e)
+            await asyncio.sleep(2)
 
 async def disconnect_db():
     try:
