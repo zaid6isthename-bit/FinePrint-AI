@@ -39,5 +39,21 @@ class LegalJargonSimplifier:
             logger.error(f"Simplification error: {e}")
             return "Could not simplify this clause."
 
+    def batch_simplify(self, clauses: list) -> list:
+        if self.simplifier is None:
+            self.load_model()
+        
+        if not clauses:
+            return []
+            
+        try:
+            inputs = ["summarize: " + c for c in clauses]
+            # T5 is compute-heavy so we keep batch_size low
+            results = self.simplifier(inputs, max_length=150, min_length=30, do_sample=False, batch_size=4)
+            return [res['summary_text'] for res in results]
+        except Exception as e:
+            logger.error(f"Batch simplification error: {e}")
+            return ["Could not simplify this clause."] * len(clauses)
+
 # Singleton instance
 legal_simplifier = LegalJargonSimplifier()

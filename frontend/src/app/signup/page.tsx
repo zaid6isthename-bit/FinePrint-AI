@@ -69,7 +69,7 @@ export default function SignupPage() {
                 className="w-full max-w-md z-10"
             >
                 <div className="glass-pane p-1 shadow-2xl shadow-black/50">
-                    <div className="bg-midnight/40 p-8 sm:p-10 rounded-sm">
+                    <div className="bg-background/40 p-8 sm:p-10 rounded-sm">
                         <div className="text-center mb-10">
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-[4px] bg-gold/10 border border-gold/20 mb-6">
                                 <UserPlus className="h-6 w-6 text-gold" />
@@ -86,7 +86,7 @@ export default function SignupPage() {
                                         id="firstName"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
-                                        className="h-12 bg-midnight/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
+                                        className="h-12 bg-background/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
                                     />
                                 </div>
                                 <div className="space-y-3">
@@ -95,7 +95,7 @@ export default function SignupPage() {
                                         id="lastName"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
-                                        className="h-12 bg-midnight/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
+                                        className="h-12 bg-background/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
                                     />
                                 </div>
                             </div>
@@ -110,7 +110,7 @@ export default function SignupPage() {
                                         placeholder="legal@corporate.ai"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="pl-12 h-12 bg-midnight/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        className="pl-12 h-12 bg-background/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
                                         required
                                     />
                                 </div>
@@ -126,7 +126,7 @@ export default function SignupPage() {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="pl-12 h-12 bg-midnight/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        className="pl-12 h-12 bg-background/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
                                         required
                                     />
                                 </div>

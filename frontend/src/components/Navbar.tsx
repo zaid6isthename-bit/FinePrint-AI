@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, Menu } from "lucide-react";
 import { motion } from "framer-motion";
+import { ModeToggle } from "@/components/ModeToggle";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -58,6 +59,7 @@ export default function Navbar() {
                                 {user.email}
                             </span>
                         </div>
+                        <ModeToggle />
                         <Button
                             variant="ghost"
                             size="icon"
@@ -69,6 +71,7 @@ export default function Navbar() {
                     </div>
                 ) : (
                     <div className="flex items-center gap-3">
+                        <ModeToggle />
                         <Link href="/login">
                             <Button variant="ghost" size="sm" className="text-[10px] font-mono tracking-[0.12em] uppercase text-muted-foreground hover:text-gold border border-transparent hover:border-white/5 px-4 h-9 rounded-[4px]">
                                 Sign In

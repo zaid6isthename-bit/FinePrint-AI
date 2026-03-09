@@ -41,8 +41,11 @@ export default function Dashboard() {
     const { toast } = useToast();
     const router = useRouter();
 
+    const [error, setError] = useState<string | null>(null);
+
     const fetchData = useCallback(async () => {
         try {
+            setError(null);
             const response = await api.get(`/documents/${id}`);
             setData(response.data);
 
@@ -53,20 +56,16 @@ export default function Dashboard() {
                 setLoading(false);
             } else if (response.data.status === "FAILED") {
                 setLoading(false);
-                toast({
-                    title: "Analysis Failed",
-                    description: "The neural engine encountered an unrecoverable structural error.",
-                    variant: "destructive"
-                });
             } else {
                 // Keep polling if PROCESSING
                 setTimeout(fetchData, 4000);
             }
         } catch (error) {
             console.error("Fetch error:", error);
+            setError("The neural uplink could not be established. Please verify your connection.");
             setLoading(false);
         }
-    }, [id, selectedClause, toast]);
+    }, [id, selectedClause]);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -121,7 +120,7 @@ export default function Dashboard() {
 
     if (authLoading || (loading && (!data || data.status === 'PROCESSING'))) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-midnight overflow-hidden relative">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background overflow-hidden relative">
                 <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-gold/5 blur-[120px] rounded-full animate-brain-pulse" />
                 <AIPresence status="analyzing" className="scale-150 mb-12" />
                 <h2 className="text-3xl font-serif font-light text-foreground mb-4 tracking-tight">Engaging Intelligence</h2>
@@ -132,22 +131,22 @@ export default function Dashboard() {
         );
     }
 
-    if (data?.status === 'FAILED') {
+    if (error || data?.status === 'FAILED') {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-midnight p-6">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
                 <div className="glass-pane p-12 max-w-md text-center">
-                    <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-6" />
-                    <h2 className="text-2xl font-serif text-foreground mb-4">Analysis Failed</h2>
-                    <p className="text-zinc-500 font-light mb-4 italic">
-                        {data.errorMessage || "The document could not be processed. This may be due to file corruption, unsupported format, or insufficient text content."}
+                    <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
+                    <h2 className="text-2xl font-serif text-foreground mb-4">{error ? "Uplink Error" : "Analysis Failed"}</h2>
+                    <p className="text-muted-foreground font-light mb-4 italic">
+                        {error || data?.errorMessage || "The document could not be processed. This may be due to file corruption, unsupported format, or insufficient text content."}
                     </p>
-                    {data.errorMessage && (
-                        <p className="text-zinc-600 text-xs font-mono mb-8 bg-zinc-900/50 p-4 rounded border border-zinc-700">
+                    {data?.errorMessage && (
+                        <p className="text-muted-foreground/60 text-xs font-mono mb-8 bg-black/10 dark:bg-zinc-900/50 p-4 rounded border border-border">
                             Technical details: {data.errorMessage}
                         </p>
                     )}
-                    <Button onClick={() => router.push('/upload')} className="bg-gold/10 hover:bg-gold/20 text-gold border border-gold/30 rounded-sm font-mono text-[10px] tracking-widest uppercase h-12 px-8 transition-all">
-                        Upload New Instrument
+                    <Button onClick={() => error ? fetchData() : router.push('/upload')} className="bg-gold/10 hover:bg-gold/20 text-gold border border-gold/30 rounded-sm font-mono text-[10px] tracking-widest uppercase h-12 px-8 transition-all">
+                        {error ? "Retry Uplink" : "Upload New Instrument"}
                     </Button>
                 </div>
             </div>
@@ -157,7 +156,7 @@ export default function Dashboard() {
     if (!data) return null;
 
     return (
-        <main className="min-h-screen pt-28 pb-12 px-6 lg:px-12 bg-midnight relative overflow-hidden">
+        <main className="min-h-screen pt-28 pb-12 px-6 lg:px-12 bg-background relative overflow-hidden">
             {/* Background Calm Atmosphere */}
             <div className="absolute top-0 inset-0 pointer-events-none">
                 <div className="absolute top-[10%] left-[-10%] w-[50%] h-[50%] bg-gold/5 blur-[120px] rounded-full animate-brain-pulse" />

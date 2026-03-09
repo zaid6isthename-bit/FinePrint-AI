@@ -58,7 +58,7 @@ export default function Home() {
             </motion.div>
           </Link>
           <Link href="/history" className="w-full sm:w-auto">
-            <Button size="lg" variant="outline" className="h-14 px-10 text-xs font-bold tracking-[0.15em] rounded-sm border-white/10 bg-transparent text-muted-foreground hover:border-gold/30 hover:text-gold uppercase transition-all w-full">
+            <Button size="lg" variant="outline" className="h-14 px-10 text-xs font-bold tracking-[0.15em] rounded-sm border-border bg-transparent text-muted-foreground hover:border-gold/30 hover:text-gold uppercase transition-all w-full">
               Vault History
             </Button>
           </Link>
@@ -78,9 +78,9 @@ export default function Home() {
       </motion.div>
 
       <div className="flex items-center gap-8 my-20 w-full max-w-3xl opacity-30">
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
         <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">Capabilities</span>
-        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
       <motion.div
@@ -88,7 +88,7 @@ export default function Home() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="grid grid-cols-1 md:grid-cols-4 gap-px w-full max-w-6xl z-10 border border-white/5 rounded-sm overflow-hidden bg-white/5"
+        className="grid grid-cols-1 md:grid-cols-4 gap-px w-full max-w-6xl z-10 border border-border rounded-sm overflow-hidden bg-border/5"
       >
         <FeatureItem
           num="01"

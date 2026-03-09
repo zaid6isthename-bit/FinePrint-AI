@@ -35,41 +35,54 @@ class DocumentService:
             
             processed_clauses = []
             
-            # 3. Analyze each clause
+            # 3. Comprehensive Neural Analysis
             analysis_start = time.time()
-            for i, text in enumerate(raw_clauses):
-                clause_type, conf = clause_classifier.classify_clause(text)
-                severity = risk_scorer.calculate_severity(text, clause_type)
-                risk_level = risk_scorer.get_risk_level_string(severity)
-                
-                simplified = None
-                if severity > 0.3:
-                    simplified = legal_simplifier.simplify_clause(text)
-                
-                clause_data = {
-                    "documentId": doc_id,
-                    "originalText": text[:4000],
-                    "simplifiedText": simplified,
-                    "clauseType": clause_type,
-                    "riskLevel": risk_level,
-                    "severityScore": float(severity)
-                }
-                
-                await db.clause.create(data=clause_data)
-                processed_clauses.append(clause_data)
-                
-                if (i + 1) % 5 == 0:
-                    logger.info(f"Processed {i+1}/{len(raw_clauses)} clauses for {doc_id}...")
-
-            logger.info(f"Forensic analysis complete in {time.time() - analysis_start:.2f}s")
             
-            # 4. Calculate final risk score and generate message
+            # Step 3.1: Batch Categorization
+            category_start = time.time()
+            classification_results = clause_classifier.batch_classify(raw_clauses)
+            logger.info(f"Clause categorization complete in {time.time() - category_start:.2f}s")
+            
+            # Step 3.2: Batch Risk Assessment
+            risk_start = time.time()
+            types = [res[0] for res in classification_results]
+            severity_scores = risk_scorer.batch_calculate_severity(raw_clauses, types)
+            logger.info(f"Risk assessment complete in {time.time() - risk_start:.2f}s")
+            
+            # Step 3.3: Selective Batch Simplification
+            sim_start = time.time()
+            to_simplify_indices = [i for i, sev in enumerate(severity_scores) if sev > 0.3]
+            simplified_texts = ["Not required"] * len(raw_clauses)
+            
+            if to_simplify_indices:
+                texts_to_sim = [raw_clauses[i] for i in to_simplify_indices]
+                sim_results = legal_simplifier.batch_simplify(texts_to_sim)
+                for idx, result_text in zip(to_simplify_indices, sim_results):
+                    simplified_texts[idx] = result_text
+            logger.info(f"Legal simplification complete in {time.time() - sim_start:.2f}s")
+            
+            # 4. Bulk Data Assembly & Persistence
+            processed_clauses = []
+            for i in range(len(raw_clauses)):
+                processed_clauses.append({
+                    "documentId": doc_id,
+                    "originalText": raw_clauses[i][:4000],
+                    "simplifiedText": simplified_texts[i] if simplified_texts[i] != "Not required" else None,
+                    "clauseType": classification_results[i][0],
+                    "riskLevel": risk_scorer.get_risk_level_string(severity_scores[i]),
+                    "severityScore": float(severity_scores[i])
+                })
+                
+            await db.clause.create_many(data=processed_clauses)
+            logger.info(f"Forensic analysis & DB sync complete in {time.time() - analysis_start:.2f}s")
+            
+            # 5. Final Risk Synthesis
             analyzer_start = time.time()
             final_score = DocumentRiskAnalyzer.calculate_total_risk_score(processed_clauses)
             neg_msg = DocumentRiskAnalyzer.generate_negotiation_message(final_score, processed_clauses)
             logger.info(f"Risk synthesis complete in {time.time() - analyzer_start:.2f}s")
             
-            # 5. Update Document status
+            # 6. Finalize Transaction
             await db.document.update(
                 where={"id": doc_id},
                 data={

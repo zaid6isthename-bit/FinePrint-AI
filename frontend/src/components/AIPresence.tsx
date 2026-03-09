@@ -65,7 +65,7 @@ export function AIPresence({ status, className = "" }: AIPresenceProps) {
                                 repeat: Infinity,
                                 ease: "easeInOut",
                             }}
-                            className="absolute inset-[-20px] rounded-full bg-[#C8A96A]/30 blur-2xl"
+                            className="absolute inset-[-20px] rounded-full bg-gold/30 blur-2xl"
                         />
 
                         {/* Inner Core */}
@@ -78,7 +78,7 @@ export function AIPresence({ status, className = "" }: AIPresenceProps) {
                                 repeat: Infinity,
                                 ease: "easeInOut",
                             }}
-                            className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#C8A96A] to-[#D9A441] shadow-[0_0_20px_rgba(200,169,106,0.5)] border border-white/20"
+                            className="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-primary shadow-[0_0_20px_rgba(var(--gold-rgb),0.5)] border border-white/20"
                         />
                     </motion.div>
                 )}

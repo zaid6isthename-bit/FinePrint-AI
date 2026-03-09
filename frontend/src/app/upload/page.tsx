@@ -60,13 +60,13 @@ export default function UploadPage() {
 
             const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData);
 
-            // Perceived quality analysis time
+            // Perceived quality analysis time - reduced now that backend is optimized
             setTimeout(() => {
                 setStep("completed");
                 setTimeout(() => {
                     router.push(`/dashboard/${response.data.id}`);
                 }, 1500);
-            }, 8000);
+            }, 2000);
 
         } catch (error: any) {
             setStep("upload");
@@ -87,14 +87,14 @@ export default function UploadPage() {
 
     if (authLoading || !user) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-midnight text-foreground">
+            <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
                 <AIPresence status="analyzing" />
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen pt-[120px] pb-24 px-6 flex flex-col items-center relative overflow-hidden bg-midnight">
+        <main className="min-h-screen pt-[120px] pb-24 px-6 flex flex-col items-center relative overflow-hidden bg-background">
             {/* Ambient Orbs */}
             <div className="absolute top-0 inset-x-0 h-screen pointer-events-none overflow-hidden">
                 <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(200,169,106,0.1)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" />
@@ -122,7 +122,7 @@ export default function UploadPage() {
                         </div>
 
                         <div className="glass-pane p-1 shadow-2xl shadow-black/40">
-                            <div className="bg-midnight/40 p-10 rounded-[4px] space-y-10">
+                            <div className="bg-background/40 p-10 rounded-[4px] space-y-10">
                                 <div className="space-y-4">
                                     <Label htmlFor="title" className="font-mono text-[9px] tracking-[0.25em] text-muted-foreground/60 uppercase ml-1">Archive Identifer</Label>
                                     <Input
@@ -130,7 +130,7 @@ export default function UploadPage() {
                                         placeholder="e.g., MSA_PRIME_2024"
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
-                                        className="bg-midnight/30 border-white/5 h-14 text-sm rounded-sm focus:ring-gold focus:border-gold/50 transition-all font-mono px-6 text-foreground placeholder:text-muted-foreground/20"
+                                        className="bg-background/30 border-white/5 h-14 text-sm rounded-sm focus:ring-gold focus:border-gold/50 transition-all font-mono px-6 text-foreground placeholder:text-muted-foreground/20"
                                     />
                                 </div>
 

@@ -98,7 +98,7 @@ export function AnalysisTheatre() {
                         <motion.path
                             key={`path-${i}`}
                             d={conn.d}
-                            stroke="#C8A96A" // Legal Gold
+                            stroke="var(--gold)" // Legal Gold
                             strokeWidth="1.5"
                             fill="none"
                             filter="url(#glow)"
@@ -121,7 +121,7 @@ export function AnalysisTheatre() {
                             cx={100 + i * 120}
                             cy={100 + (i % 2) * 300}
                             r="4"
-                            fill="#C8A96A"
+                            fill="var(--gold)"
                             initial={{ scale: 0 }}
                             animate={{
                                 scale: pulseLines ? [1, 1.5, 1] : 1,
@@ -156,12 +156,12 @@ export function AnalysisTheatre() {
                             scale: 0.9,
                             transition: { duration: 0.8, ease: "circIn" }
                         }}
-                        className="absolute inset-x-[-140px] inset-y-[-180px] w-[280px] h-[360px] glass-pane border-zinc-200 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+                        className="absolute inset-x-[-140px] inset-y-[-180px] w-[280px] h-[360px] glass-pane border-border dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
                     >
                         {/* Vertical Scan Light Sweep - Legal Gold */}
                         {i === 0 && (
                             <motion.div
-                                className="absolute inset-x-0 h-2 bg-gradient-to-b from-transparent via-[#C8A96A]/50 to-transparent z-20"
+                                className="absolute inset-x-0 h-2 bg-gradient-to-b from-transparent via-gold/50 to-transparent z-20"
                                 animate={{ top: ["-10%", "110%"] }}
                                 transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                             />
@@ -188,7 +188,7 @@ export function AnalysisTheatre() {
                                                 initial={{ x: "-100%" }}
                                                 animate={{ x: "100%" }}
                                                 transition={{ duration: 1, ease: "linear" }}
-                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-[#C8A96A]/20 to-transparent"
+                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/20 to-transparent"
                                             />
                                         )}
                                     </AnimatePresence>
@@ -239,7 +239,7 @@ export function AnalysisTheatre() {
                             <AlertTriangle className="h-5 w-5 text-[#B85C5C]" />
                             <div>
                                 <p className="text-[10px] font-bold text-[#B85C5C] uppercase tracking-widest leading-none mb-1">Risk Warning</p>
-                                <p className="text-sm font-medium text-[#E8E9EB] whitespace-nowrap">{riskNote}</p>
+                                <p className="text-sm font-medium text-foreground whitespace-nowrap">{riskNote}</p>
                             </div>
                         </motion.div>
                     )}
@@ -256,7 +256,7 @@ export function AnalysisTheatre() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="text-[#A6A9B0] dark:text-[#A6A9B0] font-medium tracking-wider text-sm text-center px-4"
+                            className="text-muted-foreground font-medium tracking-wider text-sm text-center px-4"
                         >
                             {PHRASES[phraseIdx]}
                         </motion.p>

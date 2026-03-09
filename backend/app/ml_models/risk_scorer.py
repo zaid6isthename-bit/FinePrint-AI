@@ -51,6 +51,27 @@ class RiskScorer:
         
         final_severity = min(base_severity * multiplier, 1.0)
         return round(final_severity, 2)
+
+    def batch_calculate_severity(self, clauses: list, types: list) -> list:
+        if self.scorer is None:
+            self.load_model()
+        
+        if not clauses:
+            return []
+            
+        # Limit texts to 512 tokens/chars for efficiency
+        truncated = [c[:512] for c in clauses]
+        results = self.scorer(truncated, batch_size=8)
+        
+        severities = []
+        for i, res in enumerate(results):
+            star_rating = int(res['label'][0])
+            base_severity = (6 - star_rating) * 0.2
+            multiplier = self.risk_multiplier.get(types[i], 1.0)
+            final_severity = min(base_severity * multiplier, 1.0)
+            severities.append(round(final_severity, 2))
+            
+        return severities
         
     def get_risk_level_string(self, severity_score: float) -> str:
         if severity_score > 0.8:
