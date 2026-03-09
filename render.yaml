@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: fineprint-ai-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt && python -m prisma fetch && python -m prisma generate
+    startCommand: python -m prisma db push --accept-data-loss && python app/main.py
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: PORT
+        value: "10000"
+    healthCheckPath: /health
