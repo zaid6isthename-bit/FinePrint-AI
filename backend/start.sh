@@ -1,9 +1,22 @@
 #!/bin/bash
-echo "Starting Render deployment script..."
-echo "Current Python Version:"
+set -e
+
+echo "=== FinePrint AI — Render Startup ==="
+echo "Python Version:"
 python --version
-echo "Downloading Prisma Query Engine..."
+
+echo ""
+echo "Step 1: Fetching Prisma Query Engine binary..."
+python -m prisma fetch
+
+echo ""
+echo "Step 2: Generating Prisma Client..."
 python -m prisma generate
 
-echo "Starting FastAPI server directly..."
+echo ""
+echo "Step 3: Applying database migrations..."
+python -m prisma db push --accept-data-loss
+
+echo ""
+echo "Step 4: Starting FastAPI server..."
 python app/main.py
