@@ -1,41 +1,36 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, FileText, CheckCircle2, Lock, Scale } from "lucide-react";
+import { ArrowRight, ShieldCheck, Lock, Scale, Zap, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { AIPresence } from "@/components/AIPresence";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-24 relative overflow-hidden bg-background">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 sm:p-24 relative overflow-hidden bg-transparent">
       {/* Background Calm Atmosphere */}
       <div className="absolute top-0 inset-x-0 h-screen pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[10%] w-[60%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-brain-pulse" />
-        <div className="absolute bottom-10 right-[10%] w-[40%] h-[30%] bg-[#C8A96A]/5 blur-[100px] rounded-full" />
+        <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(200,169,106,0.12)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" />
+        <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.08)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse delay-[4s]" />
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         className="text-center z-10 max-w-4xl"
       >
-        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/[0.03] border border-white/10 mb-10 backdrop-blur-md">
-          <div className="flex -space-x-2">
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <div className="w-2 h-2 rounded-full bg-[#D9A441] animate-pulse delay-75" />
-          </div>
-          <span className="text-[10px] font-bold tracking-[0.25em] text-[#A6A9B0] uppercase">Proprietary Legal Intelligence</span>
+        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-gold/10 border border-gold/30 mb-8 backdrop-blur-md">
+          <span className="text-[10px] font-mono font-bold tracking-[0.28em] text-gold uppercase">Proprietary Legal Intelligence</span>
         </div>
 
-        <h1 className="text-6xl sm:text-8xl font-semibold tracking-tight mb-8 text-foreground dark:text-[#E8E9EB]">
+        <h1 className="text-6xl sm:text-[6.5rem] font-serif font-light tracking-tight mb-8 leading-[1.05] text-foreground">
           The quiet expert. <br />
-          <span className="text-muted-foreground dark:text-[#A6A9B0] font-light">Powered by AI.</span>
+          <span className="italic text-gold italic">Powered by AI.</span>
         </h1>
 
-        <p className="text-xl sm:text-2xl text-muted-foreground dark:text-[#A6A9B0] mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-          FinePrint AI decodes legally binding contracts, uncovering risks and translating complex jargon into clear, actionable intelligence.
+        <p className="text-lg sm:text-xl text-muted-foreground mb-12 max-w-lg mx-auto leading-relaxed font-light">
+          FinePrint AI reads every clause of your contracts with the precision of a senior counsel — detecting hidden risks, quantifying exposure, and translating legalese before you sign.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -47,29 +42,29 @@ export default function Home() {
             >
               <Button
                 size="lg"
-                className="h-18 px-10 text-xl bg-primary hover:bg-[#D9A441] text-[#0E0F12] rounded-[1.5rem] group transition-all duration-500 shadow-2xl shadow-primary/30 glow-gold relative overflow-hidden w-full"
+                className="h-14 px-10 text-xs font-bold tracking-[0.15em] bg-gold/15 hover:bg-gold/20 text-gold rounded-sm border border-gold/30 uppercase transition-all duration-500 shadow-2xl shadow-gold/10 glow-gold relative overflow-hidden w-full group"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Start Intensive Scan
-                  <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                  Begin Intensive Scan
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <motion.div
-                  className="absolute inset-0 bg-white/10"
-                  initial={{ y: "100%" }}
-                  whileHover={{ y: "0%" }}
-                  transition={{ duration: 0.4 }}
+                  className="absolute inset-0 bg-white/5"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "100%" }}
+                  transition={{ duration: 0.6 }}
                 />
               </Button>
             </motion.div>
           </Link>
           <Link href="/history" className="w-full sm:w-auto">
-            <Button size="lg" variant="ghost" className="h-18 px-10 text-xl rounded-[1.5rem] border border-border hover:bg-muted dark:border-white/5 dark:hover:bg-white/5 text-muted-foreground hover:text-foreground dark:text-[#A6A9B0] dark:hover:text-[#E8E9EB] transition-all w-full">
+            <Button size="lg" variant="outline" className="h-14 px-10 text-xs font-bold tracking-[0.15em] rounded-sm border-white/10 bg-transparent text-muted-foreground hover:border-gold/30 hover:text-gold uppercase transition-all w-full">
               Vault History
             </Button>
           </Link>
         </div>
 
-        <div className="mt-16 flex items-center justify-center gap-8 text-[10px] font-bold tracking-[0.2em] text-zinc-600 uppercase">
+        <div className="mt-16 flex items-center justify-center gap-8 text-[10px] font-mono font-bold tracking-[0.2em] text-muted-foreground/50 uppercase">
           <div className="flex items-center gap-2">
             <Lock className="h-3 w-3" /> 256-bit isolation
           </div>
@@ -82,40 +77,67 @@ export default function Home() {
         </div>
       </motion.div>
 
+      <div className="flex items-center gap-8 my-20 w-full max-w-3xl opacity-30">
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+        <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground">Capabilities</span>
+        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-32 w-full max-w-6xl z-10"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="grid grid-cols-1 md:grid-cols-4 gap-px w-full max-w-6xl z-10 border border-white/5 rounded-sm overflow-hidden bg-white/5"
       >
-        <FeatureCard
-          icon={<AIPresence status="idle" />}
-          title="Detect Architecture Risk"
-          desc="Our models map the structural integrity of your agreement, spotting hidden financial exposure and termination bias."
+        <FeatureItem
+          num="01"
+          title="Zero-Shot Clause Detection"
+          desc="BART-large-MNLI classifies over 14 risk categories including auto-renewals, hidden charges, and arbitration clauses."
         />
-        <FeatureCard
-          icon={<FileText className="h-8 w-8 text-[#C8A96A]" />}
-          title="Intelligent Translation"
-          desc="Advanced NLP decodes dense legal jargon into premium summaries that maintain technical accuracy without complexity."
+        <FeatureItem
+          num="02"
+          title="Composite Risk Scoring"
+          desc="A weighted mathematical formula combining clause severity, frequency, and pattern recognition to deliver a 0–100 risk index."
         />
-        <FeatureCard
-          icon={<CheckCircle2 className="h-8 w-8 text-[#6E9E75]" />}
-          title="Negotiate with Precision"
-          desc="Receive a professionally drafted resolution protocol designed to improve agreement balance by 40%."
+        <FeatureItem
+          num="03"
+          title="Plain English Engine"
+          desc="T5 transformer models distill dense legalese into clear, actionable summaries — understand exactly what you are agreeing to."
+        />
+        <FeatureItem
+          num="04"
+          title="Negotiation Synthesis"
+          desc="Auto-drafts professional email and informal WhatsApp negotiation scripts targeting your highest-risk clauses."
         />
       </motion.div>
+
+      <div className="mt-20 flex gap-12 justify-center opacity-70">
+        <TrustStat num="14+" label="Risk Vectors" />
+        <TrustStat num="<2s" label="Analysis Time" />
+        <TrustStat num="256-Bit" label="Isolation" />
+        <TrustStat num="100%" label="Private" />
+      </div>
     </main>
   );
 }
 
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: string, desc: string }) {
+function FeatureItem({ num, title, desc }: { num: string, title: string, desc: string }) {
   return (
-    <div className="p-10 rounded-[2.5rem] glass-pane hover:bg-muted dark:hover:bg-white/[0.05] transition-all duration-700 group border-border dark:border-white/10 shadow-sm dark:shadow-none">
-      <div className="w-16 h-16 rounded-2xl bg-muted dark:bg-white/5 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-4 text-foreground dark:text-[#E8E9EB] tracking-tight">{title}</h3>
-      <p className="text-muted-foreground dark:text-[#A6A9B0] leading-relaxed font-light text-sm">{desc}</p>
+    <div className="p-8 bg-transparent hover:bg-gold/5 transition-all duration-700 group cursor-default relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      <span className="font-mono text-[10px] text-gold tracking-[0.2em] mb-4 block">{num}</span>
+      <h3 className="text-xl font-serif font-normal mb-3 text-foreground tracking-tight leading-snug">{title}</h3>
+      <p className="text-muted-foreground leading-relaxed font-light text-xs">{desc}</p>
+    </div>
+  );
+}
+
+function TrustStat({ num, label }: { num: string, label: string }) {
+  return (
+    <div className="text-center group">
+      <div className="font-serif text-3xl font-light text-gold group-hover:scale-110 transition-transform duration-500">{num}</div>
+      <div className="font-mono text-[9px] tracking-[0.2em] text-muted-foreground/60 uppercase mt-1">{label}</div>
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,8 +29,8 @@ export default function LoginPage() {
                 title: "Login Successful",
                 description: "Welcome back to FinePrint AI.",
             });
-        } catch (error: unknown) {
-            const message = (error as any).response?.data?.detail || "Invalid email or password.";
+        } catch (error: any) {
+            const message = error.response?.data?.detail || "Invalid email or password.";
             toast({
                 title: "Login Failed",
                 description: message,
@@ -42,79 +42,88 @@ export default function LoginPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-background">
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
+        <main className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden bg-transparent">
+            {/* Ambient Background */}
+            <div className="absolute top-0 inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] bg-gold/5 blur-[120px] rounded-full animate-brain-pulse" />
+                <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse delay-[3s]" />
+            </div>
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 className="w-full max-w-md z-10"
             >
-                <div className="glass-pane p-8 sm:p-10 rounded-[2.5rem]">
-                    <div className="text-center mb-10">
-                        <h1 className="text-3xl font-bold mb-3 tracking-tight text-foreground dark:text-[#E8E9EB]">Sign In</h1>
-                        <p className="text-muted-foreground dark:text-[#A6A9B0] font-light">Access your legal agreement history.</p>
-                    </div>
-
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="email" className="text-xs font-bold tracking-widest text-muted-foreground dark:text-[#A6A9B0] uppercase ml-1">Email Address</Label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground dark:text-[#A6A9B0]" />
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="name@company.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="pl-12 h-13 bg-muted/50 dark:bg-[#0E0F12]/40 border-border dark:border-white/5 text-foreground dark:text-[#E8E9EB] rounded-2xl focus:ring-primary/50 placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-600"
-                                    required
-                                />
+                <div className="glass-pane p-1 shadow-2xl shadow-black/50">
+                    <div className="bg-midnight/40 p-8 sm:p-10 rounded-sm">
+                        <div className="text-center mb-10">
+                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-[4px] bg-gold/10 border border-gold/20 mb-6">
+                                <Shield className="h-6 w-6 text-gold" />
                             </div>
+                            <h1 className="text-3xl font-serif font-light text-foreground mb-2">Vault Access</h1>
+                            <p className="text-muted-foreground/60 text-xs font-mono tracking-widest uppercase">Verified Expert Login</p>
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between px-1">
-                                <Label htmlFor="password" className="text-xs font-bold tracking-widest text-muted-foreground dark:text-[#A6A9B0] uppercase">Password</Label>
-                                <Link href="#" className="text-[10px] font-bold text-primary hover:text-foreground dark:hover:text-white uppercase tracking-tighter transition-colors">Forgot?</Link>
+                        <form onSubmit={handleLogin} className="space-y-8">
+                            <div className="space-y-3">
+                                <Label htmlFor="email" className="text-[9px] font-mono font-bold tracking-[0.25em] text-muted-foreground/60 uppercase ml-1">Archive ID (Email)</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/30" />
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        placeholder="expert@fineprint.ai"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="pl-12 h-13 bg-midnight/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        required
+                                    />
+                                </div>
                             </div>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground dark:text-[#A6A9B0]" />
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="pl-12 h-13 bg-muted/50 dark:bg-[#0E0F12]/40 border-border dark:border-white/5 text-foreground dark:text-[#E8E9EB] rounded-2xl focus:ring-primary/50 placeholder:text-muted-foreground/60 dark:placeholder:text-zinc-600"
-                                    required
-                                />
+
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between px-1">
+                                    <Label htmlFor="password" className="text-[9px] font-mono font-bold tracking-[0.25em] text-muted-foreground/60 uppercase">Encryption Key</Label>
+                                </div>
+                                <div className="relative">
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/30" />
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        placeholder="••••••••"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        className="pl-12 h-13 bg-midnight/30 border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        required
+                                    />
+                                </div>
                             </div>
+
+                            <Button
+                                type="submit"
+                                className="w-full h-14 text-[10px] font-mono font-bold tracking-[0.2em] bg-gold/10 hover:bg-gold/20 text-gold rounded-sm border border-gold/30 uppercase transition-all duration-700 shadow-xl shadow-gold/5 glow-gold"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Validating...
+                                    </>
+                                ) : (
+                                    "Initialize Session"
+                                )}
+                            </Button>
+                        </form>
+
+                        <div className="mt-10 pt-8 border-t border-white/5 text-center">
+                            <p className="text-[9px] font-mono tracking-[0.1em] text-muted-foreground/40 uppercase">
+                                New operative?{" "}
+                                <Link href="/signup" className="text-gold hover:text-white transition-all inline-flex items-center group ml-1">
+                                    Request Access
+                                    <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </p>
                         </div>
-
-                        <Button
-                            type="submit"
-                            className="w-full h-14 text-lg bg-primary hover:bg-[#D9A441] text-[#0E0F12] rounded-2xl font-semibold shadow-xl shadow-primary/20 transition-all duration-500"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                    Accessing Vault...
-                                </>
-                            ) : (
-                                "Sign In"
-                            )}
-                        </Button>
-                    </form>
-
-                    <div className="mt-8 text-center text-xs font-bold tracking-[0.1em] text-muted-foreground dark:text-[#A6A9B0] uppercase">
-                        Don&apos;t have an account?{" "}
-                        <Link href="/signup" className="text-primary hover:text-foreground dark:hover:text-white transition-all inline-flex items-center group ml-1">
-                            Create one
-                            <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
-                        </Link>
                     </div>
                 </div>
             </motion.div>

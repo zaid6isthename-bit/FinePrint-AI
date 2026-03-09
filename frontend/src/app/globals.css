@@ -12,55 +12,57 @@
 
 @layer base {
   :root {
-    --background: 220 33% 98%;
-    --foreground: 224 71% 2%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 2%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 2%;
-    --primary: 40 49% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 224 71% 2%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 30%;
-    --accent: 40 49% 45%;
-    --accent-foreground: 224 71% 2%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 40 49% 45%;
-    --radius: 1rem;
-
-    /* Risk Colors Light */
-    --low: 129 21% 45%;
-    --moderate: 39 67% 45%;
-    --high: 0 41% 45%;
-  }
-
-  .dark {
-    --background: 225 15% 6%;
-    /* #0E0F12 Original Midnight Counsel */
+    --background: 220 15% 6%;
     --foreground: 220 4% 92%;
-    /* #E8E9EB */
     --card: 222 15% 13%;
-    /* #1C1F26 */
     --card-foreground: 220 4% 92%;
     --popover: 225 15% 6%;
     --popover-foreground: 220 4% 92%;
     --primary: 40 49% 60%;
-    /* Muted Legal Gold #C8A96A */
+    --primary-foreground: 225 15% 6%;
+    --secondary: 222 15% 15%;
+    --secondary-foreground: 220 4% 92%;
+    --muted: 228 6% 67%;
+    --muted-foreground: 228 6% 42%;
+    --accent: 40 49% 60%;
+    --accent-foreground: 225 15% 6%;
+    --destructive: 0 41% 54%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 15% 18%;
+    --input: 222 15% 18%;
+    --ring: 40 49% 60%;
+    --radius: 0.25rem;
+
+    /* Midnight Counsel Specifics */
+    --midnight: #0E0F12;
+    --midnight-rgb: 14, 15, 18;
+    --gold: #C8A96A;
+    --gold-rgb: 200, 169, 106;
+    --text: #E8E9EB;
+    --muted-color: #A6A9B0;
+
+    /* Risk Colors */
+    --low: 129 21% 53%;
+    --moderate: 39 67% 55%;
+    --high: 0 41% 54%;
+  }
+
+  .dark {
+    --background: 225 15% 6%;
+    --foreground: 220 4% 92%;
+    --card: 222 15% 13%;
+    --card-foreground: 220 4% 92%;
+    --popover: 225 15% 6%;
+    --popover-foreground: 220 4% 92%;
+    --primary: 40 49% 60%;
     --primary-foreground: 225 15% 6%;
     --secondary: 222 15% 15%;
     --secondary-foreground: 220 4% 92%;
     --muted: 222 15% 13%;
     --muted-foreground: 228 6% 67%;
-    /* #A6A9B0 */
     --accent: 40 49% 60%;
     --accent-foreground: 225 15% 6%;
     --destructive: 0 41% 54%;
-    /* High risk #B85C5C */
     --destructive-foreground: 210 40% 98%;
     --border: 222 15% 18%;
     --input: 222 15% 18%;
@@ -81,16 +83,27 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: var(--midnight);
   }
 }
 
-/* Calm Intelligence Component Styles */
+/* Midnight Counsel Glass Component Styles */
 .glass-pane {
-  @apply bg-zinc-50/50 dark:bg-[#1C1F26]/60 backdrop-blur-md border border-zinc-200 dark:border-white/5 shadow-xl dark:shadow-2xl;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 4px;
+}
+
+.glass-pane-gold {
+  background: rgba(200, 169, 106, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(200, 169, 106, 0.3);
+  border-radius: 4px;
 }
 
 .glow-gold {
-  box-shadow: 0 0 20px -5px rgba(200, 169, 106, 0.3);
+  box-shadow: 0 0 40px -5px rgba(200, 169, 106, 0.15);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -102,11 +115,11 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-zinc-200 dark:bg-white/10 rounded-full;
+  @apply bg-white/10 rounded-full;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  @apply bg-zinc-300 dark:bg-white/20;
+  @apply bg-white/20;
 }
 
 /* Animation Utilities */
@@ -114,20 +127,20 @@
 
   0%,
   100% {
-    opacity: 0.3;
+    opacity: 0.6;
     transform: scale(1);
-    filter: blur(40px);
+    filter: blur(80px);
   }
 
   50% {
-    opacity: 0.6;
-    transform: scale(1.1);
-    filter: blur(60px);
+    opacity: 1;
+    transform: scale(1.12);
+    filter: blur(100px);
   }
 }
 
 .animate-brain-pulse {
-  animation: brain-pulse 4s ease-in-out infinite;
+  animation: brain-pulse 8s ease-in-out infinite;
 }
 
 @keyframes scan-sweep {
@@ -152,6 +165,6 @@
 
 .scan-line {
   height: 2px;
-  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
   animation: scan-sweep 3s ease-in-out infinite;
 }

@@ -18,48 +18,56 @@ class DocumentService:
         Background task to process the uploaded document through the ML pipeline.
         """
         try:
-            logger.info(f"Starting processing for document {doc_id}")
+            import time
+            start_time = time.time()
+            logger.info(f"Starting neural audit for document {doc_id}")
             
             # 1. Extract and Clean Text
+            extract_start = time.time()
             raw_text = PDFExtractor.extract_text(file_bytes)
             clean_text = PDFExtractor.clean_text(raw_text)
+            logger.info(f"Text extraction complete in {time.time() - extract_start:.2f}s")
             
             # 2. Split into Clauses
+            split_start = time.time()
             raw_clauses = DocumentSplitter.split_into_clauses(clean_text)
+            logger.info(f"Document split into {len(raw_clauses)} segments in {time.time() - split_start:.2f}s")
             
             processed_clauses = []
             
             # 3. Analyze each clause
-            for text in raw_clauses:
-                # Classify
+            analysis_start = time.time()
+            for i, text in enumerate(raw_clauses):
                 clause_type, conf = clause_classifier.classify_clause(text)
-                
-                # If it's highly standard or irrelevant, we might optionally skip or score low
-                # Score severity
                 severity = risk_scorer.calculate_severity(text, clause_type)
                 risk_level = risk_scorer.get_risk_level_string(severity)
                 
-                # Simplify (only if risk is medium or higher to save compute)
                 simplified = None
                 if severity > 0.3:
                     simplified = legal_simplifier.simplify_clause(text)
                 
                 clause_data = {
                     "documentId": doc_id,
-                    "originalText": text[:4000],  # Limit length for DB safety
+                    "originalText": text[:4000],
                     "simplifiedText": simplified,
                     "clauseType": clause_type,
                     "riskLevel": risk_level,
                     "severityScore": float(severity)
                 }
                 
-                # Save clause to DB
-                new_clause = await db.clause.create(data=clause_data)
+                await db.clause.create(data=clause_data)
                 processed_clauses.append(clause_data)
+                
+                if (i + 1) % 5 == 0:
+                    logger.info(f"Processed {i+1}/{len(raw_clauses)} clauses for {doc_id}...")
 
+            logger.info(f"Forensic analysis complete in {time.time() - analysis_start:.2f}s")
+            
             # 4. Calculate final risk score and generate message
+            analyzer_start = time.time()
             final_score = DocumentRiskAnalyzer.calculate_total_risk_score(processed_clauses)
             neg_msg = DocumentRiskAnalyzer.generate_negotiation_message(final_score, processed_clauses)
+            logger.info(f"Risk synthesis complete in {time.time() - analyzer_start:.2f}s")
             
             # 5. Update Document status
             await db.document.update(
@@ -70,10 +78,11 @@ class DocumentService:
                     "negotiationMsg": neg_msg
                 }
             )
-            logger.info(f"Finished processing document {doc_id}. Risk Score: {final_score}")
+            total_duration = time.time() - start_time
+            logger.info(f"Audit finalized for {doc_id}. Score: {final_score}. Total time: {total_duration:.2f}s")
 
         except Exception as e:
-            logger.error(f"Error processing document {doc_id}: {e}")
+            logger.error(f"FATAL ERROR during audit of {doc_id}: {str(e)}", exc_info=True)
             await db.document.update(
                 where={"id": doc_id},
                 data={"status": "FAILED"}
