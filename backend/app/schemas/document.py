@@ -20,6 +20,7 @@ class DocumentResponse(BaseModel):
     riskScore: Optional[float]
     status: str
     negotiationMsg: Optional[str]
+    errorMessage: Optional[str] = None
     clauses: Optional[List[ClauseResponse]] = []
 
     class Config:

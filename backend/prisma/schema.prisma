@@ -32,6 +32,7 @@ model Document {
   user             User         @relation(fields: [userId], references: [id])
   clauses          Clause[]
   negotiationMsg   String?      // Storing the generated message
+  errorMessage     String?      // Stores actual error details when FAILED
 }
 
 enum DocStatus {

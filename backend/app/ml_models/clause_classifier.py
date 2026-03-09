@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 class LegalClauseClassifier:
     def __init__(self):
         # We use zero-shot classification for flexibility in clause categorization
-        self.model_name = "facebook/bart-large-mnli"
+        # Using distilbart instead of bart-large to save memory and improve speed on basic servers
+        self.model_name = "valhalla/distilbart-mnli-12-1"
         self.classifier = None
         self.labels = [
             "Hidden Charges",

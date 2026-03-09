@@ -82,8 +82,12 @@ class DocumentService:
             logger.info(f"Audit finalized for {doc_id}. Score: {final_score}. Total time: {total_duration:.2f}s")
 
         except Exception as e:
-            logger.error(f"FATAL ERROR during audit of {doc_id}: {str(e)}", exc_info=True)
+            error_message = str(e)
+            logger.error(f"FATAL ERROR during audit of {doc_id}: {error_message}", exc_info=True)
             await db.document.update(
                 where={"id": doc_id},
-                data={"status": "FAILED"}
+                data={
+                    "status": "FAILED",
+                    "errorMessage": error_message
+                }
             )

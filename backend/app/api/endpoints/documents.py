@@ -42,6 +42,7 @@ async def upload_document(
         "status": document.status,
         "riskScore": document.riskScore,
         "negotiationMsg": document.negotiationMsg,
+        "errorMessage": getattr(document, 'errorMessage', None),
         "clauses": []
     }
 
@@ -61,7 +62,8 @@ async def get_history(current_user: UserResponse = Depends(get_current_user)):
             "uploadDate": doc.uploadDate.isoformat(),
             "status": doc.status,
             "riskScore": doc.riskScore,
-            "negotiationMsg": doc.negotiationMsg
+            "negotiationMsg": doc.negotiationMsg,
+            "errorMessage": getattr(doc, 'errorMessage', None)
         })
     return result
 
@@ -94,5 +96,6 @@ async def get_document(document_id: str, current_user: UserResponse = Depends(ge
         "status": document.status,
         "riskScore": document.riskScore,
         "negotiationMsg": document.negotiationMsg,
+        "errorMessage": getattr(document, 'errorMessage', None),
         "clauses": clauses
     }

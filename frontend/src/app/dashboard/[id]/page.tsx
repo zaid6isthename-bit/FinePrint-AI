@@ -29,6 +29,7 @@ interface DocumentData {
     status: string;
     clauses: Clause[];
     negotiationMsg: string | null;
+    errorMessage?: string | null;
 }
 
 export default function Dashboard() {
@@ -136,8 +137,15 @@ export default function Dashboard() {
             <div className="min-h-screen flex flex-col items-center justify-center bg-midnight p-6">
                 <div className="glass-pane p-12 max-w-md text-center">
                     <AlertCircle className="h-16 w-16 text-red-400 mx-auto mb-6" />
-                    <h2 className="text-2xl font-serif text-foreground mb-4">Integrity Failure</h2>
-                    <p className="text-zinc-500 font-light mb-8 italic">The document architecture is incompatible with our neural models or exceeds secure extraction boundaries.</p>
+                    <h2 className="text-2xl font-serif text-foreground mb-4">Analysis Failed</h2>
+                    <p className="text-zinc-500 font-light mb-4 italic">
+                        {data.errorMessage || "The document could not be processed. This may be due to file corruption, unsupported format, or insufficient text content."}
+                    </p>
+                    {data.errorMessage && (
+                        <p className="text-zinc-600 text-xs font-mono mb-8 bg-zinc-900/50 p-4 rounded border border-zinc-700">
+                            Technical details: {data.errorMessage}
+                        </p>
+                    )}
                     <Button onClick={() => router.push('/upload')} className="bg-gold/10 hover:bg-gold/20 text-gold border border-gold/30 rounded-sm font-mono text-[10px] tracking-widest uppercase h-12 px-8 transition-all">
                         Upload New Instrument
                     </Button>
