@@ -28,8 +28,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup():
     logger.info("Starting up FinePrint AI Backend...")
-    import asyncio
-    asyncio.create_task(connect_db())
+    await connect_db()
     logger.info("Web server initialization complete.")
 
 @app.on_event("shutdown")

@@ -30,7 +30,11 @@ export default function LoginPage() {
                 description: "Welcome back to FinePrint AI.",
             });
         } catch (error: any) {
-            const message = error.response?.data?.detail || "Invalid email or password.";
+            const detail = error.response?.data?.detail;
+            const message = typeof detail === 'string'
+                ? detail
+                : (Array.isArray(detail) ? detail[0]?.msg : "Invalid email or password.");
+
             toast({
                 title: "Login Failed",
                 description: message,

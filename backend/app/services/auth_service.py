@@ -8,10 +8,6 @@ from app.core.config import settings
 class AuthService:
     @staticmethod
     async def create_user(user_in: UserCreate):
-        # Ensure DB is connected
-        if not db.is_connected():
-            await db.connect()
-
         existing_user = await db.user.find_unique(where={"email": user_in.email})
         if existing_user:
             raise HTTPException(
@@ -33,9 +29,6 @@ class AuthService:
 
     @staticmethod
     async def authenticate_user(user_in: UserLogin):
-        if not db.is_connected():
-            await db.connect()
-
         user = await db.user.find_unique(where={"email": user_in.email})
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")

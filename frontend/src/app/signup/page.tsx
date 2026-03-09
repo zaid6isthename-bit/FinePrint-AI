@@ -40,7 +40,11 @@ export default function SignupPage() {
                 description: "Welcome to FinePrint AI!",
             });
         } catch (error: any) {
-            const message = error.response?.data?.detail || "Something went wrong. Please try again.";
+            const detail = error.response?.data?.detail;
+            const message = typeof detail === 'string'
+                ? detail
+                : (Array.isArray(detail) ? detail[0]?.msg : "Something went wrong. Please try again.");
+
             toast({
                 title: "Signup Failed",
                 description: message,
