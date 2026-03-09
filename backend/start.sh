@@ -3,9 +3,14 @@ set -e
 
 echo "=== FinePrint AI — Render Startup ==="
 
-echo "Applying schema to database..."
+echo "Step 1: Fetching Prisma query engine binary..."
+python -m prisma fetch
+
+echo "Step 2: Generating Prisma client..."
+python -m prisma generate
+
+echo "Step 3: Applying schema to database..."
 python -m prisma db push --accept-data-loss
 
-echo "Starting FastAPI server..."
-PORT=${PORT:-10000}
-exec uvicorn app.main:app --host 0.0.0.0 --port $PORT
+echo "Step 4: Starting FastAPI server..."
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}
