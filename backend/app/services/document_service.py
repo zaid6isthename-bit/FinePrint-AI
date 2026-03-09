@@ -54,7 +54,7 @@ class DocumentService:
                 }
                 
                 # Save clause to DB
-                new_clause = await prisma.clause.create(data=clause_data)
+                new_clause = await db.clause.create(data=clause_data)
                 processed_clauses.append(clause_data)
 
             # 4. Calculate final risk score and generate message
@@ -62,7 +62,7 @@ class DocumentService:
             neg_msg = DocumentRiskAnalyzer.generate_negotiation_message(final_score, processed_clauses)
             
             # 5. Update Document status
-            await prisma.document.update(
+            await db.document.update(
                 where={"id": doc_id},
                 data={
                     "status": "COMPLETED",
@@ -74,7 +74,7 @@ class DocumentService:
 
         except Exception as e:
             logger.error(f"Error processing document {doc_id}: {e}")
-            await prisma.document.update(
+            await db.document.update(
                 where={"id": doc_id},
                 data={"status": "FAILED"}
             )
