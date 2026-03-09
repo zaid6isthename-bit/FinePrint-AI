@@ -60,13 +60,13 @@ export default function UploadPage() {
 
             const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData);
 
-            // Perceived quality analysis time - reduced now that backend is optimized
+            // Optimized transitions to meet the "exactly 2 seconds" requirement
             setTimeout(() => {
                 setStep("completed");
                 setTimeout(() => {
                     router.push(`/dashboard/${response.data.id}`);
-                }, 1500);
-            }, 2000);
+                }, 1000); // 1s show for speedometer
+            }, 1000); // 1s show for analysis theatre
 
         } catch (error: any) {
             setStep("upload");
@@ -245,36 +245,84 @@ export default function UploadPage() {
                                         <p className="text-muted-foreground/60 text-sm font-light">The quiet audit is complete. Teleporting to dashboard...</p>
                                     </div>
 
-                                    <div className="relative w-80 h-40 flex flex-col items-center justify-end overflow-hidden">
-                                        <motion.div
-                                            initial={{ rotate: -90, opacity: 0 }}
-                                            animate={{ rotate: 180, opacity: 1 }}
-                                            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                                            className="absolute top-0 w-80 h-80 rounded-full border-[10px] border-white/5"
-                                        />
-                                        <motion.div
-                                            initial={{ rotate: -90 }}
-                                            animate={{ rotate: 30 }}
-                                            transition={{ duration: 2, delay: 0.5, ease: [0.33, 1, 0.68, 1] }}
-                                            className="absolute top-0 w-80 h-80 rounded-full border-[10px] border-gold border-t-transparent border-l-transparent z-10 shadow-[0_0_50px_rgba(200,169,106,0.2)]"
-                                        />
-                                        <div className="z-20 flex flex-col items-center select-none">
-                                            <motion.span
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ delay: 1.5 }}
-                                                className="text-7xl font-serif font-light text-foreground tracking-tighter"
+                                    <div className="relative w-80 h-48 flex flex-col items-center justify-center">
+                                        {/* Speedometer Base */}
+                                        <svg viewBox="0 0 200 120" className="w-full h-full drop-shadow-[0_0_15px_rgba(var(--gold-rgb),0.2)]">
+                                            <defs>
+                                                <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                    <stop offset="0%" stopColor="rgb(var(--low))" />
+                                                    <stop offset="50%" stopColor="var(--gold)" />
+                                                    <stop offset="100%" stopColor="rgb(var(--high))" />
+                                                </linearGradient>
+                                            </defs>
+
+                                            {/* Track */}
+                                            <path
+                                                d="M 20 100 A 80 80 0 0 1 180 100"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="12"
+                                                className="text-muted/10"
+                                                strokeLinecap="round"
+                                            />
+
+                                            {/* Progress Fill */}
+                                            <motion.path
+                                                d="M 20 100 A 80 80 0 0 1 180 100"
+                                                fill="none"
+                                                stroke="url(#gauge-gradient)"
+                                                strokeWidth="12"
+                                                strokeLinecap="round"
+                                                initial={{ pathLength: 0 }}
+                                                animate={{ pathLength: 0.66 }}
+                                                transition={{ duration: 2, ease: "circOut", delay: 0.5 }}
+                                            />
+
+                                            {/* Tick Marks */}
+                                            {[...Array(9)].map((_, i) => (
+                                                <line
+                                                    key={i}
+                                                    x1={100 + 70 * Math.cos((180 + i * 22.5) * Math.PI / 180)}
+                                                    y1={100 + 70 * Math.sin((180 + i * 22.5) * Math.PI / 180)}
+                                                    x2={100 + 85 * Math.cos((180 + i * 22.5) * Math.PI / 180)}
+                                                    y2={100 + 85 * Math.sin((180 + i * 22.5) * Math.PI / 180)}
+                                                    className="stroke-muted-foreground/20"
+                                                    strokeWidth="1"
+                                                />
+                                            ))}
+
+                                            {/* Needle */}
+                                            <motion.g
+                                                initial={{ rotate: -90 }}
+                                                animate={{ rotate: 30 }}
+                                                style={{ originX: '100px', originY: '100px' }}
+                                                transition={{ duration: 2, ease: "circOut", delay: 0.5 }}
                                             >
-                                                66
-                                            </motion.span>
-                                            <span className="text-[9px] font-mono font-bold text-muted-foreground/60 uppercase tracking-[0.3em] mb-6">Risk Intensity</span>
+                                                <line x1="100" y1="100" x2="100" y2="35" className="stroke-gold" strokeWidth="3" strokeLinecap="round" />
+                                                <circle cx="100" cy="100" r="6" className="fill-background stroke-gold" strokeWidth="2" />
+                                                <circle cx="100" cy="100" r="2" className="fill-gold" />
+                                            </motion.g>
+                                        </svg>
+
+                                        <div className="absolute bottom-4 flex flex-col items-center select-none">
+                                            <div className="flex items-baseline">
+                                                <RiskValue finalValue={66} />
+                                                <motion.span
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    transition={{ delay: 0.8 }}
+                                                    className="text-gold/50 text-xl font-serif ml-1"
+                                                >
+                                                    %
+                                                </motion.span>
+                                            </div>
+                                            <span className="text-[10px] font-mono font-bold text-muted-foreground/40 uppercase tracking-[0.4em] mt-2">Risk Intensity</span>
                                         </div>
                                     </div>
-
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
-                                        transition={{ delay: 2.2 }}
+                                        transition={{ delay: 0.5 }}
                                         className="h-px w-48 bg-white/10 rounded-full overflow-hidden"
                                     >
                                         <motion.div
@@ -300,5 +348,37 @@ export default function UploadPage() {
                 )}
             </AnimatePresence>
         </main>
+    );
+}
+
+function RiskValue({ finalValue }: { finalValue: number }) {
+    const [displayValue, setDisplayValue] = useState(0);
+
+    useEffect(() => {
+        let startTime: number;
+        let animationFrame: number;
+        const duration = 1000; // Match the 1s speedometer show
+
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const progress = (timestamp - startTime) / duration;
+
+            if (progress < 1) {
+                // Random flicker before settling
+                setDisplayValue(Math.floor(Math.random() * 100));
+                animationFrame = requestAnimationFrame(animate);
+            } else {
+                setDisplayValue(finalValue);
+            }
+        };
+
+        animationFrame = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(animationFrame);
+    }, [finalValue]);
+
+    return (
+        <span className="text-6xl font-serif font-light text-foreground tracking-tighter">
+            {displayValue}
+        </span>
     );
 }

@@ -42,8 +42,12 @@ export default function Dashboard() {
     const router = useRouter();
 
     const [error, setError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
+    const MAX_RETRIES = 3;
 
     const fetchData = useCallback(async () => {
+        if (!id) return;
+
         try {
             setError(null);
             const response = await api.get(`/documents/${id}`);
@@ -58,22 +62,34 @@ export default function Dashboard() {
                 setLoading(false);
             } else {
                 // Keep polling if PROCESSING
-                setTimeout(fetchData, 4000);
+                setTimeout(fetchData, 800);
             }
-        } catch (error) {
-            console.error("Fetch error:", error);
-            setError("The neural uplink could not be established. Please verify your connection.");
-            setLoading(false);
+        } catch (err: any) {
+            console.error("Fetch error:", err);
+
+            if (retryCount < MAX_RETRIES) {
+                setRetryCount(prev => prev + 1);
+            } else {
+                const message = err.response?.data?.detail || err.message || "The neural uplink could not be established.";
+                const status = err.response?.status ? ` (Status: ${err.response.status})` : "";
+                setError(`${message}${status}. Please verify your connection.`);
+                setLoading(false);
+            }
         }
-    }, [id, selectedClause]);
+    }, [id, selectedClause, retryCount]);
 
     useEffect(() => {
         if (!authLoading && !user) {
             router.push("/login");
             return;
         }
-        if (id) fetchData();
-    }, [id, user, authLoading, router, fetchData]);
+
+        // Initial fetch or retry fetch
+        if (id) {
+            const timer = setTimeout(fetchData, retryCount > 0 ? 1500 * retryCount : 0);
+            return () => clearTimeout(timer);
+        }
+    }, [id, user, authLoading, router, fetchData, retryCount]);
 
     const copyNegotiation = () => {
         if (data?.negotiationMsg) {

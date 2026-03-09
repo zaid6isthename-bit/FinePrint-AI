@@ -69,33 +69,42 @@ async def get_history(current_user: UserResponse = Depends(get_current_user)):
 
 @router.get("/{document_id}", response_model=DocumentResponse)
 async def get_document(document_id: str, current_user: UserResponse = Depends(get_current_user)):
-    document = await db.document.find_unique(
-        where={"id": document_id},
-        include={"clauses": True}
-    )
-    
-    if not document or document.userId != current_user.id:
-        raise HTTPException(status_code=404, detail="Document not found")
+    try:
+        document = await db.document.find_unique(
+            where={"id": document_id},
+            include={"clauses": True}
+        )
         
-    clauses = [
-        ClauseResponse(
-            id=c.id,
-            originalText=c.originalText,
-            simplifiedText=c.simplifiedText,
-            clauseType=c.clauseType,
-            riskLevel=c.riskLevel,
-            severityScore=c.severityScore
-        ) for c in document.clauses
-    ] if document.clauses else []
-    
-    return {
-        "id": document.id,
-        "title": document.title,
-        "filename": document.filename,
-        "uploadDate": document.uploadDate.isoformat(),
-        "status": document.status,
-        "riskScore": document.riskScore,
-        "negotiationMsg": document.negotiationMsg,
-        "errorMessage": getattr(document, 'errorMessage', None),
-        "clauses": clauses
-    }
+        if not document:
+            raise HTTPException(status_code=404, detail=f"Document {document_id} not found in vault.")
+            
+        if document.userId != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied. This instrument belongs to another operative.")
+            
+        clauses = [
+            ClauseResponse(
+                id=c.id,
+                originalText=c.originalText,
+                simplifiedText=c.simplifiedText,
+                clauseType=c.clauseType,
+                riskLevel=c.riskLevel,
+                severityScore=c.severityScore
+            ) for c in document.clauses
+        ] if document.clauses else []
+        
+        return {
+            "id": document.id,
+            "title": document.title,
+            "filename": document.filename,
+            "uploadDate": document.uploadDate.isoformat(),
+            "status": document.status,
+            "riskScore": document.riskScore,
+            "negotiationMsg": document.negotiationMsg,
+            "errorMessage": getattr(document, 'errorMessage', None),
+            "clauses": clauses
+        }
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        logger.error(f"Error fetching document {document_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Neural retrieval failure: {str(e)}")
