@@ -58,11 +58,7 @@ export default function UploadPage() {
             const formData = new FormData();
             formData.append("file", file);
 
-            const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData);
 
             // Minimum analysis duration for UX/perceived quality
             setTimeout(() => {
@@ -75,7 +71,12 @@ export default function UploadPage() {
         } catch (error: unknown) {
             setStep("upload");
             setIsUploading(false);
-            const message = (error as any).response?.data?.detail || "Could not upload the document. Please try again.";
+
+            const detail = (error as any).response?.data?.detail;
+            const message = typeof detail === 'string'
+                ? detail
+                : (Array.isArray(detail) ? detail[0]?.msg : "Could not upload the document. Please try again.");
+
             toast({
                 title: "Upload Failed",
                 description: message,
