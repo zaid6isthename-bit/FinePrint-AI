@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
 import os
-from app.api import auth, documents
+from app.db.prisma import connect_db, disconnect_db
+from app.api.endpoints import auth, documents
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -14,35 +15,28 @@ app = FastAPI(
     description="Backend API for FinePrint AI - Legal Agreement Risk Analyzer",
     version="1.0.0"
 )
-from fastapi.responses import Response
-from fastapi.requests import Request
 
-@app.options("/{rest_of_path:path}")
-async def options_handler(request: Request):
-    response = Response()
-    origin = request.headers.get("origin")
-
-    response.headers["Access-Control-Allow-Origin"] = origin or "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-
-    return response
 # Configure CORS - open to all origins since auth uses JWT headers, not cookies
-# Configure CORS for production frontend
-origins = [
-    "http://localhost:3000",
-    "https://fine-print-ai-rouge.vercel.app",
-    "https://fine-print-3gpoef16a-zaid6isthename-bits-projects.vercel.app"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+async def startup():
+    logger.info("Starting up FinePrint AI Backend...")
+    import asyncio
+    asyncio.create_task(connect_db())
+    logger.info("Web server initialization complete.")
+
+@app.on_event("shutdown")
+async def shutdown():
+    logger.info("Shutting down FinePrint AI Backend...")
+    await disconnect_db()
+
 # Include Routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(documents.router, prefix="/api/documents", tags=["Documents"])
@@ -51,8 +45,10 @@ app.include_router(documents.router, prefix="/api/documents", tags=["Documents"]
 async def root():
     return {"message": "Welcome to the FinePrint AI API"}
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 8000))
-    # Disable reload in production to avoid file watcher crashes that prevent port binding
     uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=False)
