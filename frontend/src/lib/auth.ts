@@ -18,8 +18,11 @@ const providers: Provider[] = [
       }
 
       try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+        const apiUrl = baseUrl.includes("/api") ? baseUrl : `${baseUrl.replace(/\/$/, "")}/api`;
+
         // High-fidelity proxy to backend auth service
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        const response = await fetch(`${apiUrl}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -105,8 +108,8 @@ export const authOptions: NextAuthOptions = {
         const dbUser = await findUserByEmail(user.email);
         if (dbUser) {
           token.id = dbUser.id;
-          token.firstName = dbUser.firstName;
-          token.lastName = dbUser.lastName;
+          token.firstName = dbUser.firstName ?? undefined;
+          token.lastName = dbUser.lastName ?? undefined;
           token.picture = dbUser.image ?? token.picture;
         }
       }

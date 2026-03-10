@@ -1,7 +1,16 @@
 import axios from "axios";
 
+const getBaseURL = () => {
+    const url = process.env.NEXT_PUBLIC_API_URL || "/api";
+    // Ensure the /api prefix is present for the backend routing
+    if (url.startsWith("http") && !url.includes("/api")) {
+        return url.endsWith("/") ? `${url}api` : `${url}/api`;
+    }
+    return url;
+};
+
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
+    baseURL: getBaseURL(),
     withCredentials: false, // Prevents CORS preflight failures on many shared hosting envs
 });
 
