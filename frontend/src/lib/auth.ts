@@ -92,25 +92,20 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      const [firstName, ...rest] = (user.name || "").trim().split(/\s+/).filter(Boolean);
-      await upsertSocialUser({
-        email: user.email,
-        firstName,
-        lastName: rest.join(" ") || undefined,
-        image: user.image || undefined,
-        provider: account.provider,
-      });
-
+      // TODO: Implement unified backend social sync for a billion-dollar architecture
+      // For now, we trust the OAuth session but bypass local filesystem persistence to prevent 500 errors on Vercel
       return true;
     },
     async jwt({ token, user }) {
-      if (user?.email) {
-        const dbUser = await findUserByEmail(user.email);
-        if (dbUser) {
-          token.id = dbUser.id;
-          token.firstName = dbUser.firstName ?? undefined;
-          token.lastName = dbUser.lastName ?? undefined;
-          token.picture = dbUser.image ?? token.picture;
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.picture = user.image;
+        if ("firstName" in user) {
+          token.firstName = user.firstName;
+        }
+        if ("lastName" in user) {
+          token.lastName = user.lastName;
         }
       }
 
