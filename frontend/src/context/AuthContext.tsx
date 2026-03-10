@@ -15,6 +15,8 @@ interface AuthContextType {
     user: User | null;
     logout: () => void;
     isLoading: boolean;
+    isAuthenticated: boolean;
+    status: "loading" | "authenticated" | "unauthenticated";
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,18 +26,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: session, status } = useSession();
 
     useEffect(() => {
-        if (session?.user?.id && session.user.email) {
+        if (session?.user?.email) {
             setUser({
-                id: session.user.id,
+                id: session.user.id || "",
                 email: session.user.email,
                 firstName: session.user.firstName,
                 lastName: session.user.lastName,
                 image: session.user.image,
             });
-        } else {
+        } else if (status !== "loading") {
             setUser(null);
         }
-    }, [session]);
+    }, [session, status]);
 
     const logout = () => {
         setUser(null);
@@ -43,7 +45,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, logout, isLoading: status === "loading" }}>
+        <AuthContext.Provider value={{ 
+            user, 
+            logout, 
+            isLoading: status === "loading",
+            isAuthenticated: status === "authenticated",
+            status
+        }}>
             {children}
         </AuthContext.Provider>
     );

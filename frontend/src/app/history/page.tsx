@@ -21,18 +21,18 @@ interface DocHistory {
 export default function HistoryPage() {
     const [history, setHistory] = useState<DocHistory[]>([]);
     const [loading, setLoading] = useState(true);
-    const { user, isLoading: authLoading } = useAuth();
+    const { user, isLoading: authLoading, isAuthenticated } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (!authLoading && !user) {
+        if (!authLoading && !isAuthenticated) {
             router.push("/login");
             return;
         }
-        if (user) {
+        if (isAuthenticated && user) {
             fetchHistory();
         }
-    }, [user, authLoading, router]);
+    }, [user, authLoading, isAuthenticated, router]);
 
     const fetchHistory = async () => {
         try {
@@ -45,7 +45,7 @@ export default function HistoryPage() {
         }
     };
 
-    if (authLoading || loading) {
+    if (authLoading || !isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <AIPresence status="analyzing" />

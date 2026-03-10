@@ -21,13 +21,13 @@ export default function UploadPage() {
     const [step, setStep] = useState<"upload" | "analyzing" | "completed">("upload");
     const router = useRouter();
     const { toast } = useToast();
-    const { user, isLoading: authLoading } = useAuth();
+    const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        if (!authLoading && !user) {
+        if (!authLoading && !isAuthenticated) {
             router.push("/login");
         }
-    }, [user, authLoading, router]);
+    }, [isAuthenticated, authLoading, router]);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -85,7 +85,7 @@ export default function UploadPage() {
         }
     };
 
-    if (authLoading || !user) {
+    if (authLoading || !isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
                 <AIPresence status="analyzing" />
