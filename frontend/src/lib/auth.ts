@@ -2,10 +2,10 @@ import type { NextAuthOptions } from "next-auth";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import type { Provider } from "next-auth/providers";
+import { createPasswordHash } from "@/lib/server/store";
 import { findUserByEmail, upsertSocialUser } from "@/lib/server/repository";
 
-const providers: Provider[] = [
+const providers: NextAuthOptions["providers"] = [
   CredentialsProvider({
     name: "Credentials",
     credentials: {
@@ -18,25 +18,14 @@ const providers: Provider[] = [
       }
 
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-        const apiUrl = baseUrl.includes("/api") ? baseUrl : `${baseUrl.replace(/\/$/, "")}/api`;
-
-        // High-fidelity proxy to backend auth service
-        const response = await fetch(`${apiUrl}/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: credentials.email,
-            password: credentials.password,
-          }),
-        });
-
-        if (!response.ok) {
+        const user = await findUserByEmail(credentials.email);
+        if (!user?.passwordHash) {
           return null;
         }
 
-        const data = await response.json();
-        const user = data.user;
+        if (user.passwordHash !== createPasswordHash(credentials.password)) {
+          return null;
+        }
 
         return {
           id: user.id,
@@ -45,10 +34,9 @@ const providers: Provider[] = [
           image: user.image,
           firstName: user.firstName,
           lastName: user.lastName,
-          accessToken: data.access_token,
         };
       } catch (error) {
-        console.error("Auth proxy failure:", error);
+        console.error("Credentials authorize failure:", error);
         return null;
       }
     },
