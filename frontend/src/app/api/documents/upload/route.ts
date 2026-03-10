@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { analyzeDocument } from "@/lib/server/analyzer";
-import { createId, getUserFromAuthHeader, readDb, writeDb } from "@/lib/server/store";
+import { createId, readDb, writeDb } from "@/lib/server/store";
 
 export async function POST(request: Request) {
-    const user = await getUserFromAuthHeader(request.headers.get("authorization"));
-    if (!user) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
         return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
     }
 
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
         riskScore: analysis.riskScore,
         negotiationMsg: analysis.negotiationMsg,
         errorMessage: null,
-        userId: user.id,
+        userId: session.user.id,
         clauses: analysis.clauses,
     };
 

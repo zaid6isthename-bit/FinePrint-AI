@@ -7,5 +7,5 @@ try {
   await rm(target, { recursive: true, force: true });
   console.log(`Cleared ${target}`);
 } catch (error) {
-  console.warn("Unable to clear .next before startup:", error);
+  console.warn("Unable to clear .next before build:", error);
 }

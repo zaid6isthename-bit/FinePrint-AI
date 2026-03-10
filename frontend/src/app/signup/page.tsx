@@ -4,12 +4,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Loader2, Mail, Lock, ArrowRight, UserPlus } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/lib/api";
+import { SocialSignInButtons } from "@/components/auth/SocialSignInButtons";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -17,7 +18,6 @@ export default function SignupPage() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
     const { toast } = useToast();
 
     const handleSignup = async (e: React.FormEvent) => {
@@ -32,13 +32,27 @@ export default function SignupPage() {
                 lastName
             });
 
-            const loginResponse = await api.post("/auth/login", { email, password });
-            login(loginResponse.data.access_token, loginResponse.data.user);
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: "/upload",
+            });
+
+            if (result?.error) {
+                toast({
+                    title: "Account Created",
+                    description: "Your account is ready. Please sign in to continue.",
+                });
+                window.location.href = "/login";
+                return;
+            }
 
             toast({
                 title: "Account Created",
                 description: "Welcome to FinePrint AI!",
             });
+            window.location.href = "/upload";
         } catch (error: any) {
             const detail = error.response?.data?.detail;
             const message = typeof detail === 'string'
@@ -147,6 +161,14 @@ export default function SignupPage() {
                                 )}
                             </Button>
                         </form>
+
+                        <div className="my-6 flex items-center gap-3">
+                            <div className="h-px flex-1 bg-white/5" />
+                            <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">or</span>
+                            <div className="h-px flex-1 bg-white/5" />
+                        </div>
+
+                        <SocialSignInButtons />
 
                         <div className="mt-10 pt-8 border-t border-white/5 text-center">
                             <p className="text-[9px] font-mono tracking-[0.1em] text-muted-foreground/40 uppercase">

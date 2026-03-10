@@ -4,18 +4,17 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Loader2, Mail, Lock, ArrowRight, Shield } from "lucide-react";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import api from "@/lib/api";
+import { SocialSignInButtons } from "@/components/auth/SocialSignInButtons";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useAuth();
     const { toast } = useToast();
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -23,21 +22,27 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            const response = await api.post("/auth/login", { email, password });
-            login(response.data.access_token, response.data.user);
-            toast({
-                title: "Login Successful",
-                description: "Welcome back to FinePrint AI.",
+            const result = await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+                callbackUrl: "/upload",
             });
-        } catch (error: any) {
-            const detail = error.response?.data?.detail;
-            const message = typeof detail === 'string'
-                ? detail
-                : (Array.isArray(detail) ? detail[0]?.msg : "Invalid email or password.");
 
+            if (result?.error) {
+                toast({
+                    title: "Login Failed",
+                    description: "Invalid email or password.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            window.location.href = "/upload";
+        } catch {
             toast({
                 title: "Login Failed",
-                description: message,
+                description: "Something went wrong while starting your session.",
                 variant: "destructive",
             });
         } finally {
@@ -118,6 +123,14 @@ export default function LoginPage() {
                                 )}
                             </Button>
                         </form>
+
+                        <div className="my-6 flex items-center gap-3">
+                            <div className="h-px flex-1 bg-white/5" />
+                            <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">or</span>
+                            <div className="h-px flex-1 bg-white/5" />
+                        </div>
+
+                        <SocialSignInButtons />
 
                         <div className="mt-10 pt-8 border-t border-white/5 text-center">
                             <p className="text-[9px] font-mono tracking-[0.1em] text-muted-foreground/40 uppercase">

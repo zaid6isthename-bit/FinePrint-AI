@@ -54,7 +54,12 @@ export default function Navbar() {
                 {user ? (
                     <div className="flex items-center gap-4">
                         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-[4px] bg-white/5 border border-white/10">
-                            <User className="h-3 w-3 text-gold" />
+                            {user.image ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={user.image} alt={user.email} className="h-4 w-4 rounded-full object-cover" />
+                            ) : (
+                                <User className="h-3 w-3 text-gold" />
+                            )}
                             <span className="text-[10px] font-mono tracking-wider text-muted-foreground max-w-[100px] truncate">
                                 {user.email}
                             </span>

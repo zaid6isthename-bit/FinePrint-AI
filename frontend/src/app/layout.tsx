@@ -3,10 +3,9 @@ import { Inter, Cormorant_Garamond, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Navbar from "@/components/Navbar";
-import { AuthProvider } from "@/context/AuthContext";
 import MouseHalo from "@/components/MouseHalo";
 import ParticlePixelGrid from "@/components/ParticlePixelGrid";
-import { ThemeProvider } from "@/components/theme-provider";
+import { AppProviders } from "@/components/providers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const cormorantGaramond = Cormorant_Garamond({
@@ -34,20 +33,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${cormorantGaramond.variable} ${dmMono.variable} font-sans min-h-screen bg-background text-foreground overflow-x-hidden`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
+        <AppProviders>
             <ParticlePixelGrid />
             <MouseHalo />
             <Navbar />
             {children}
             <Toaster />
-          </AuthProvider>
-        </ThemeProvider>
+        </AppProviders>
       </body>
     </html>
   );
