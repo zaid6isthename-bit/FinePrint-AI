@@ -2,7 +2,8 @@ import type { NextAuthOptions } from "next-auth";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { createPasswordHash, findUserByEmail, sanitizeUser, upsertOAuthUser } from "@/lib/server/store";
+import { createPasswordHash, sanitizeUser } from "@/lib/server/store";
+import { findUserByEmail, upsertSocialUser } from "@/lib/server/repository";
 
 const providers = [
   CredentialsProvider({
@@ -79,7 +80,7 @@ export const authOptions: NextAuthOptions = {
       }
 
       const [firstName, ...rest] = (user.name || "").trim().split(/\s+/).filter(Boolean);
-      await upsertOAuthUser({
+      await upsertSocialUser({
         email: user.email,
         firstName,
         lastName: rest.join(" ") || undefined,

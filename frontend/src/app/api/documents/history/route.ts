@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { readDb } from "@/lib/server/store";
+import { listDocumentsByUser } from "@/lib/server/repository";
 
 export async function GET(request: Request) {
     const session = await getServerSession(authOptions);
@@ -9,9 +9,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ detail: "Not authenticated" }, { status: 401 });
     }
 
-    const db = await readDb();
-    const documents = db.documents
-        .filter((document) => document.userId === session.user.id)
+    const documents = (await listDocumentsByUser(session.user.id))
         .map((document) => ({
             id: document.id,
             title: document.title,

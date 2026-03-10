@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String?
+  firstName    String?
+  lastName     String?
+  image        String?
+  provider     String?
+  createdAt    DateTime   @default(now())
+  documents    Document[]
+}
+
+model Document {
+  id             String    @id @default(uuid())
+  title          String
+  filename       String
+  uploadDate     DateTime  @default(now())
+  riskScore      Float?
+  status         String    @default("PROCESSING")
+  negotiationMsg String?
+  errorMessage   String?
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clauses        Clause[]
+}
+
+model Clause {
+  id             String   @id @default(uuid())
+  clauseType     String
+  riskLevel      String
+  severityScore  Float
+  originalText   String
+  simplifiedText String?
+  documentId     String
+  document       Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}

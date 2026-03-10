@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createId, createPasswordHash, readDb, sanitizeUser, writeDb } from "@/lib/server/store";
+import { createEmailUser, findUserByEmail } from "@/lib/server/repository";
 
 export async function POST(request: Request) {
     const body = await request.json();
@@ -12,23 +12,17 @@ export async function POST(request: Request) {
         return NextResponse.json({ detail: "Email and password are required." }, { status: 400 });
     }
 
-    const db = await readDb();
-    const existingUser = db.users.find((user) => user.email === email);
+    const existingUser = await findUserByEmail(email);
     if (existingUser) {
         return NextResponse.json({ detail: "Email already registered" }, { status: 400 });
     }
 
-    const user = {
-        id: createId(),
+    const user = await createEmailUser({
         email,
-        passwordHash: createPasswordHash(password),
-        firstName: firstName || undefined,
-        lastName: lastName || undefined,
-        createdAt: new Date().toISOString(),
-    };
+        password,
+        firstName,
+        lastName,
+    });
 
-    db.users.push(user);
-    await writeDb(db);
-
-    return NextResponse.json(sanitizeUser(user), { status: 201 });
+    return NextResponse.json(user, { status: 201 });
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { analyzeDocument } from "@/lib/server/analyzer";
-import { createId, readDb, writeDb } from "@/lib/server/store";
+import { createCompletedDocument } from "@/lib/server/repository";
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -27,23 +27,14 @@ export async function POST(request: Request) {
     }
 
     const analysis = analyzeDocument(title, file.name);
-    const now = new Date().toISOString();
-    const document = {
-        id: createId(),
+    const document = await createCompletedDocument({
         title,
         filename: file.name,
-        uploadDate: now,
-        status: "COMPLETED" as const,
         riskScore: analysis.riskScore,
         negotiationMsg: analysis.negotiationMsg,
-        errorMessage: null,
         userId: session.user.id,
         clauses: analysis.clauses,
-    };
-
-    const db = await readDb();
-    db.documents.unshift(document);
-    await writeDb(db);
+    });
 
     return NextResponse.json(document, { status: 200 });
 }

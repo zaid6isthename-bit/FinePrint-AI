@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { readDb } from "@/lib/server/store";
+import { getDocumentById } from "@/lib/server/repository";
 
 export async function GET(
     request: Request,
@@ -13,8 +13,7 @@ export async function GET(
     }
 
     const { id } = await context.params;
-    const db = await readDb();
-    const document = db.documents.find((entry) => entry.id === id);
+    const document = await getDocumentById(id);
 
     if (!document) {
         return NextResponse.json({ detail: `Document ${id} not found in vault.` }, { status: 404 });
