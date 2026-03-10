@@ -2,10 +2,10 @@ import type { NextAuthOptions } from "next-auth";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { createPasswordHash, sanitizeUser } from "@/lib/server/store";
+import type { Provider } from "next-auth/providers";
 import { findUserByEmail, upsertSocialUser } from "@/lib/server/repository";
 
-const providers = [
+const providers: Provider[] = [
   CredentialsProvider({
     name: "Credentials",
     credentials: {
@@ -13,31 +13,41 @@ const providers = [
       password: { label: "Password", type: "password" },
     },
     async authorize(credentials) {
-      const email = String(credentials?.email ?? "").trim().toLowerCase();
-      const password = String(credentials?.password ?? "");
-
-      if (!email || !password) {
+      if (!credentials?.email || !credentials?.password) {
         return null;
       }
 
-      const user = await findUserByEmail(email);
-      if (!user?.passwordHash) {
+      try {
+        // High-fidelity proxy to backend auth service
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        });
+
+        if (!response.ok) {
+          return null;
+        }
+
+        const data = await response.json();
+        const user = data.user;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
+          image: user.image,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          accessToken: data.access_token,
+        };
+      } catch (error) {
+        console.error("Auth proxy failure:", error);
         return null;
       }
-
-      if (user.passwordHash !== createPasswordHash(password)) {
-        return null;
-      }
-
-      const safeUser = sanitizeUser(user);
-      return {
-        id: safeUser.id,
-        email: safeUser.email,
-        name: [safeUser.firstName, safeUser.lastName].filter(Boolean).join(" ") || safeUser.email,
-        image: safeUser.image,
-        firstName: safeUser.firstName,
-        lastName: safeUser.lastName,
-      };
     },
   }),
 ];
@@ -108,7 +118,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = String(token.id ?? "");
         session.user.firstName = typeof token.firstName === "string" ? token.firstName : undefined;
         session.user.lastName = typeof token.lastName === "string" ? token.lastName : undefined;
-        session.user.image = typeof token.picture === "string" ? token.picture : session.user.image;
+        session.user.image = typeof token.picture === "string" ? token.picture : (session.user.image ?? undefined);
       }
 
       return session;

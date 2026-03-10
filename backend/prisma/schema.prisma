@@ -2,20 +2,22 @@ generator client {
   provider             = "prisma-client-py"
   interface            = "asyncio"
   recursive_type_depth = 5
+  output               = "../app/db/prisma_client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
   id             String      @id @default(uuid())
   email          String      @unique
-  hashedPassword String
+  passwordHash   String?     // Renamed to match frontend client-side expectations
   firstName      String?
   lastName       String?
+  image          String?     // Added for social profiles
+  provider       String?     // Added to track 'google', 'apple', or 'credentials'
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   documents      Document[]
@@ -27,18 +29,12 @@ model Document {
   filename         String
   uploadDate       DateTime     @default(now())
   riskScore        Float?
-  status           DocStatus    @default(PROCESSING)
+  status           String       @default("PROCESSING")
   userId           String
-  user             User         @relation(fields: [userId], references: [id])
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   clauses          Clause[]
-  negotiationMsg   String?      // Storing the generated message
-  errorMessage     String?      // Stores actual error details when FAILED
-}
-
-enum DocStatus {
-  PROCESSING
-  COMPLETED
-  FAILED
+  negotiationMsg   String?      
+  errorMessage     String?      
 }
 
 model Clause {
@@ -47,7 +43,7 @@ model Clause {
   document         Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
   originalText     String       
   simplifiedText   String?
-  clauseType       String       // e.g., 'Hidden Charges', 'Auto Renewal'
-  riskLevel        String       // 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'
-  severityScore    Float        // 0.0 to 1.0
+  clauseType       String       
+  riskLevel        String       
+  severityScore    Float        
 }

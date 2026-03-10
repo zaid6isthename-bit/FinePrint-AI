@@ -20,7 +20,7 @@ class AuthService:
         new_user = await db.user.create(
             data={
                 "email": user_in.email,
-                "hashedPassword": hashed_password,
+                "passwordHash": hashed_password,
                 "firstName": user_in.firstName,
                 "lastName": user_in.lastName
             }
@@ -32,7 +32,7 @@ class AuthService:
         user = await db.user.find_unique(where={"email": user_in.email})
         if not user:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-        if not verify_password(user_in.password, user.hashedPassword):
+        if not user.passwordHash or not verify_password(user_in.password, user.passwordHash):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

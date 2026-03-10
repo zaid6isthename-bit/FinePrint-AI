@@ -11,8 +11,10 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import api from "@/lib/api";
 import { SocialSignInButtons } from "@/components/auth/SocialSignInButtons";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
+    const router = useRouter();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -40,19 +42,20 @@ export default function SignupPage() {
             });
 
             if (result?.error) {
+                console.error("Auto-login failed:", result.error);
                 toast({
-                    title: "Account Created",
-                    description: "Your account is ready. Please sign in to continue.",
+                    title: "Account Restricted",
+                    description: "Your account is created, but immediate entry was denied. Please sign in manually.",
                 });
-                window.location.href = "/login";
+                router.push("/login?email=" + encodeURIComponent(email));
                 return;
             }
 
             toast({
-                title: "Account Created",
-                description: "Welcome to FinePrint AI!",
+                title: "Credentials Verified",
+                description: "Deep-link established. Welcome to the Vault.",
             });
-            window.location.href = "/upload";
+            router.push("/upload");
         } catch (error: any) {
             const detail = error.response?.data?.detail;
             const message = typeof detail === 'string'
