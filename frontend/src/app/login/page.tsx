@@ -50,7 +50,7 @@ export default function LoginPage() {
             {/* Ambient Background */}
             <div className="absolute top-0 inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-100px] left-[-100px] w-[500px] h-[500px] bg-gold/5 blur-[120px] rounded-full animate-brain-pulse" />
-                <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse delay-[3s]" />
+                <div className="absolute bottom-[-50px] right-[-50px] w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse" style={{ animationDelay: "3s" }} />
             </div>
 
             <motion.div
@@ -134,3 +134,4 @@ export default function LoginPage() {
         </main>
     );
 }
+

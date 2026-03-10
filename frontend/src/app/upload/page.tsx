@@ -98,7 +98,7 @@ export default function UploadPage() {
             {/* Ambient Orbs */}
             <div className="absolute top-0 inset-x-0 h-screen pointer-events-none overflow-hidden">
                 <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(200,169,106,0.1)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" />
-                <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.06)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse delay-[4s]" />
+                <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.06)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" style={{ animationDelay: "4s" }} />
             </div>
 
             <AnimatePresence mode="wait">
@@ -290,18 +290,6 @@ export default function UploadPage() {
                                                     strokeWidth="1"
                                                 />
                                             ))}
-
-                                            {/* Needle */}
-                                            <motion.g
-                                                initial={{ rotate: -90 }}
-                                                animate={{ rotate: 30 }}
-                                                style={{ originX: '100px', originY: '100px' }}
-                                                transition={{ duration: 2, ease: "circOut", delay: 0.5 }}
-                                            >
-                                                <line x1="100" y1="100" x2="100" y2="35" className="stroke-gold" strokeWidth="3" strokeLinecap="round" />
-                                                <circle cx="100" cy="100" r="6" className="fill-background stroke-gold" strokeWidth="2" />
-                                                <circle cx="100" cy="100" r="2" className="fill-gold" />
-                                            </motion.g>
                                         </svg>
 
                                         <div className="absolute bottom-4 flex flex-col items-center select-none">
@@ -382,3 +370,5 @@ function RiskValue({ finalValue }: { finalValue: number }) {
         </span>
     );
 }
+
+

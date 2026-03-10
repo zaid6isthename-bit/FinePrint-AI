@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, ShieldCheck, Lock, Scale, Zap, Info } from "lucide-react";
+import { ArrowRight, ShieldCheck, Lock, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -11,7 +11,10 @@ export default function Home() {
       {/* Background Calm Atmosphere */}
       <div className="absolute top-0 inset-x-0 h-screen pointer-events-none overflow-hidden">
         <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(200,169,106,0.12)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" />
-        <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.08)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse delay-[4s]" />
+        <div
+          className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.08)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse"
+          style={{ animationDelay: "4s" }}
+        />
       </div>
 
       <motion.div
@@ -30,7 +33,7 @@ export default function Home() {
         </h1>
 
         <p className="text-lg sm:text-xl text-muted-foreground mb-12 max-w-lg mx-auto leading-relaxed font-light">
-          FinePrint AI reads every clause of your contracts with the precision of a senior counsel — detecting hidden risks, quantifying exposure, and translating legalese before you sign.
+          FinePrint AI reads every clause of your contracts with the precision of a senior counsel - detecting hidden risks, quantifying exposure, and translating legalese before you sign.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
@@ -98,12 +101,12 @@ export default function Home() {
         <FeatureItem
           num="02"
           title="Composite Risk Scoring"
-          desc="A weighted mathematical formula combining clause severity, frequency, and pattern recognition to deliver a 0–100 risk index."
+          desc="A weighted mathematical formula combining clause severity, frequency, and pattern recognition to deliver a 0-100 risk index."
         />
         <FeatureItem
           num="03"
           title="Plain English Engine"
-          desc="T5 transformer models distill dense legalese into clear, actionable summaries — understand exactly what you are agreeing to."
+          desc="T5 transformer models distill dense legalese into clear, actionable summaries - understand exactly what you are agreeing to."
         />
         <FeatureItem
           num="04"
@@ -122,7 +125,7 @@ export default function Home() {
   );
 }
 
-function FeatureItem({ num, title, desc }: { num: string, title: string, desc: string }) {
+function FeatureItem({ num, title, desc }: { num: string; title: string; desc: string }) {
   return (
     <div className="p-8 bg-transparent hover:bg-gold/5 transition-all duration-700 group cursor-default relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
@@ -133,7 +136,7 @@ function FeatureItem({ num, title, desc }: { num: string, title: string, desc: s
   );
 }
 
-function TrustStat({ num, label }: { num: string, label: string }) {
+function TrustStat({ num, label }: { num: string; label: string }) {
   return (
     <div className="text-center group">
       <div className="font-serif text-3xl font-light text-gold group-hover:scale-110 transition-transform duration-500">{num}</div>

@@ -60,7 +60,7 @@ export default function SignupPage() {
             {/* Ambient Background */}
             <div className="absolute top-0 inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-50px] right-[-50px] w-[400px] h-[400px] bg-gold/5 blur-[120px] rounded-full animate-brain-pulse" />
-                <div className="absolute bottom-[-100px] left-[-100px] w-[500px] h-[500px] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse delay-[2s]" />
+                <div className="absolute bottom-[-100px] left-[-100px] w-[500px] h-[500px] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse" style={{ animationDelay: "2s" }} />
             </div>
 
             <motion.div
@@ -163,3 +163,4 @@ export default function SignupPage() {
         </main>
     );
 }
+
