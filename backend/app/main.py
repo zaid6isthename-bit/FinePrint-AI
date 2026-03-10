@@ -16,12 +16,17 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS - open to all origins since auth uses JWT headers, not cookies
+# Configure CORS - support for credentials requires explicit origins or regex
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "https://fineprint-ai.vercel.app",
+    ],
+    allow_origin_regex="https://fine-print.*\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "/api",
-    withCredentials: true,
+    withCredentials: false, // Prevents CORS preflight failures on many shared hosting envs
 });
 
 api.interceptors.response.use(
