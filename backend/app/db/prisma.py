@@ -1,4 +1,4 @@
-from app.db.prisma_client import Prisma
+from prisma import Prisma
 import asyncio
 
 db = Prisma()
