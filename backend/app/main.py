@@ -17,7 +17,6 @@ app = FastAPI(
 )
 
 # Configure CORS - support for credentials requires explicit origins
-# Adding specific Vercel URLs for deployment environments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -27,10 +26,8 @@ app.add_middleware(
     ],
     allow_origin_regex=r"https://fine-print.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
-    max_age=600,  # Cache preflight for 10 minutes
 )
 
 @app.on_event("startup")

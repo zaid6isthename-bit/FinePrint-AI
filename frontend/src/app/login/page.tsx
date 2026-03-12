@@ -22,6 +22,7 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
+            console.log("Attempting login with email:", email);
             const result = await signIn("credentials", {
                 email,
                 password,
@@ -29,17 +30,24 @@ export default function LoginPage() {
                 callbackUrl: "/upload",
             });
 
+            console.log("SignIn result:", result);
+
             if (result?.error) {
+                console.error("Login error:", result.error);
                 toast({
                     title: "Login Failed",
-                    description: "Invalid email or password.",
+                    description: result.error || "Invalid email or password.",
                     variant: "destructive",
                 });
                 return;
             }
 
-            window.location.href = "/upload";
-        } catch {
+            if (result?.ok) {
+                console.log("Login successful, redirecting to /upload");
+                window.location.href = "/upload";
+            }
+        } catch (error) {
+            console.error("Login exception:", error);
             toast({
                 title: "Login Failed",
                 description: "Something went wrong while starting your session.",
