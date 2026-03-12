@@ -30,15 +30,7 @@ export default function UploadPage() {
         }
     }, [isAuthenticated, isInitialized, router]);
 
-    // Show loading state while auth is initializing
-    if (!isInitialized) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-gold" />
-            </div>
-        );
-    }
-
+    // Define all hooks BEFORE any conditional returns
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
             setFile(acceptedFiles[acceptedFiles.length - 1] || acceptedFiles[0]);
@@ -94,6 +86,15 @@ export default function UploadPage() {
             });
         }
     };
+
+    // NOW check if initialized and render conditionally
+    if (!isInitialized) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-gold" />
+            </div>
+        );
+    }
 
     if (authLoading || !isAuthenticated) {
         return (
