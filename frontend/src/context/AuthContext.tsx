@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { signOut, useSession } from "next-auth/react";
 
 interface User {
@@ -17,15 +17,18 @@ interface AuthContextType {
     isLoading: boolean;
     isAuthenticated: boolean;
     status: "loading" | "authenticated" | "unauthenticated";
+    isInitialized: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
     const { data: session, status } = useSession();
 
     useEffect(() => {
+        // Only update user state when session actually changes
         if (session?.user?.email) {
             setUser({
                 id: session.user.id || "",
@@ -34,15 +37,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 lastName: session.user.lastName,
                 image: session.user.image,
             });
-        } else if (status !== "loading") {
+        } else if (status === "unauthenticated") {
             setUser(null);
+        }
+        
+        // Mark as initialized once status is determined (not loading)
+        if (status !== "loading") {
+            setIsInitialized(true);
         }
     }, [session, status]);
 
-    const logout = () => {
+    const logout = useCallback(async () => {
         setUser(null);
-        void signOut({ callbackUrl: "/login" });
-    };
+        setIsInitialized(false);
+        await signOut({ callbackUrl: "/login", redirect: true });
+    }, []);
 
     return (
         <AuthContext.Provider value={{ 
@@ -50,7 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             logout, 
             isLoading: status === "loading",
             isAuthenticated: status === "authenticated",
-            status
+            status,
+            isInitialized
         }}>
             {children}
         </AuthContext.Provider>

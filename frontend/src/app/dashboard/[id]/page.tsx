@@ -176,7 +176,7 @@ export default function Dashboard() {
             {/* Background Calm Atmosphere */}
             <div className="absolute top-0 inset-0 pointer-events-none">
                 <div className="absolute top-[10%] left-[-10%] w-[50%] h-[50%] bg-gold/5 blur-[120px] rounded-full animate-brain-pulse" />
-                <div className="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse" style={{ animationDelay: "3s" }} />
+                <div className="absolute bottom-[10%] right-[-5%] w-[40%] h-[40%] bg-blue-500/5 blur-[100px] rounded-full animate-brain-pulse delay-[3s]" />
             </div>
 
             <div className="max-w-[1600px] mx-auto z-10 relative">
@@ -418,4 +418,3 @@ export default function Dashboard() {
         </main>
     );
 }
-

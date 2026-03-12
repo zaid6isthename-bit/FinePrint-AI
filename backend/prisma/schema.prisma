@@ -2,22 +2,20 @@ generator client {
   provider             = "prisma-client-py"
   interface            = "asyncio"
   recursive_type_depth = 5
-  output               = "../app/db/prisma_client"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
   id             String      @id @default(uuid())
   email          String      @unique
-  passwordHash   String?     // Renamed to match frontend client-side expectations
+  hashedPassword String
   firstName      String?
   lastName       String?
-  image          String?     // Added for social profiles
-  provider       String?     // Added to track 'google', 'apple', or 'credentials'
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   documents      Document[]
@@ -29,12 +27,18 @@ model Document {
   filename         String
   uploadDate       DateTime     @default(now())
   riskScore        Float?
-  status           String       @default("PROCESSING")
+  status           DocStatus    @default(PROCESSING)
   userId           String
-  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id])
   clauses          Clause[]
-  negotiationMsg   String?      
-  errorMessage     String?      
+  negotiationMsg   String?      // Storing the generated message
+  errorMessage     String?      // Stores actual error details when FAILED
+}
+
+enum DocStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
 }
 
 model Clause {
@@ -43,7 +47,7 @@ model Clause {
   document         Document     @relation(fields: [documentId], references: [id], onDelete: Cascade)
   originalText     String       
   simplifiedText   String?
-  clauseType       String       
-  riskLevel        String       
-  severityScore    Float        
+  clauseType       String       // e.g., 'Hidden Charges', 'Auto Renewal'
+  riskLevel        String       // 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'
+  severityScore    Float        // 0.0 to 1.0
 }

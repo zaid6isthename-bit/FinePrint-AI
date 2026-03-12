@@ -1,7 +1,40 @@
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+
+// Extend the session types to include custom fields
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      firstName?: string;
+      lastName?: string;
+      image?: string | null;
+      name?: string;
+    };
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    image?: string | null;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    picture?: string;
+  }
+}
 
 const providers: NextAuthOptions["providers"] = [
   CredentialsProvider({
@@ -19,7 +52,7 @@ const providers: NextAuthOptions["providers"] = [
         const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
         const apiUrl = baseUrl.includes("/api") ? baseUrl : `${baseUrl.replace(/\/$/, "")}/api`;
         
-        // High-fidelity proxy to backend auth service
+        // Fetch from backend auth service
         const response = await fetch(`${apiUrl}/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -30,6 +63,7 @@ const providers: NextAuthOptions["providers"] = [
         });
 
         if (!response.ok) {
+          console.error("Backend auth response not ok:", response.status);
           return null;
         }
 
@@ -40,12 +74,12 @@ const providers: NextAuthOptions["providers"] = [
           id: user.id,
           email: user.email,
           name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
-          image: user.image ?? undefined,
+          image: user.image ?? null,
           firstName: user.firstName ?? undefined,
           lastName: user.lastName ?? undefined,
         };
       } catch (error) {
-        console.error("Auth proxy failure:", error);
+        console.error("Auth provider error:", error);
         return null;
       }
     },
@@ -74,6 +108,8 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || "fineprint-dev-secret-change-me",
   session: {
     strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   pages: {
     signIn: "/login",
@@ -81,42 +117,45 @@ export const authOptions: NextAuthOptions = {
   providers,
   callbacks: {
     async signIn({ user, account }) {
-      if (!user.email || !account?.provider) {
-        return false;
-      }
-
-      if (account.provider === "credentials") {
+      // Allow sign in for both credentials and OAuth providers
+      if (account?.provider === "credentials" && user?.email) {
         return true;
       }
 
-      // TODO: Implement unified backend social sync for a billion-dollar architecture
-      // For now, we trust the OAuth session but bypass local filesystem persistence to prevent 500 errors on Vercel
-      return true;
+      // For OAuth providers, allow if user has email
+      if (user?.email && account?.provider) {
+        return true;
+      }
+
+      return false;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
+      // Initial JWT creation (when user logs in)
       if (user) {
         token.id = user.id;
         token.email = user.email;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
         token.picture = user.image;
-        if ("firstName" in user) {
-          token.firstName = user.firstName;
-        }
-        if ("lastName" in user) {
-          token.lastName = user.lastName;
-        }
       }
 
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }): Promise<Session> {
+      // Reconstruct session from JWT token
       if (session.user) {
-        session.user.id = String(token.id ?? "");
-        session.user.firstName = typeof token.firstName === "string" ? token.firstName : undefined;
-        session.user.lastName = typeof token.lastName === "string" ? token.lastName : undefined;
-        session.user.image = typeof token.picture === "string" ? token.picture : (session.user.image ?? undefined);
+        session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.firstName = token.firstName;
+        session.user.lastName = token.lastName;
+        session.user.image = token.picture ?? null;
+        session.user.name = [token.firstName, token.lastName]
+          .filter(Boolean)
+          .join(" ") || token.email;
       }
 
       return session;
     },
   },
 };
+

@@ -21,13 +21,23 @@ export default function UploadPage() {
     const [step, setStep] = useState<"upload" | "analyzing" | "completed">("upload");
     const router = useRouter();
     const { toast } = useToast();
-    const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+    const { user, isLoading: authLoading, isAuthenticated, isInitialized } = useAuth();
 
     useEffect(() => {
-        if (!authLoading && !isAuthenticated) {
+        // Only redirect after auth context is fully initialized
+        if (isInitialized && !isAuthenticated) {
             router.push("/login");
         }
-    }, [isAuthenticated, authLoading, router]);
+    }, [isAuthenticated, isInitialized, router]);
+
+    // Show loading state while auth is initializing
+    if (!isInitialized) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-gold" />
+            </div>
+        );
+    }
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
