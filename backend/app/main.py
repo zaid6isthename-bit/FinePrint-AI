@@ -16,7 +16,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS - support for credentials requires explicit origins or regex
+# Configure CORS - support for credentials requires explicit origins
+# Adding specific Vercel URLs for deployment environments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -24,10 +25,12 @@ app.add_middleware(
         "http://localhost:3001",
         "https://fineprint-ai.vercel.app",
     ],
-    allow_origin_regex="https://fine-print.*\.vercel\.app",
+    allow_origin_regex=r"https://fine-print.*\.vercel\.app",
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=600,  # Cache preflight for 10 minutes
 )
 
 @app.on_event("startup")
