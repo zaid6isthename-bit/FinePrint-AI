@@ -1,5 +1,6 @@
 import logging
 # transformers is lazily imported inside load_model to speed up server boot
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -19,15 +20,49 @@ class LegalClauseClassifier:
             "Termination Clauses",
             "Standard Terms"
         ]
+        self.keyword_map = {
+            "Hidden Charges": ["charge", "charges", "fee", "fees", "billing", "price", "penalty"],
+            "Auto Renewal": ["renew", "renewal", "subscription", "term automatically", "auto-renew"],
+            "Data Sharing Consent": ["data", "privacy", "share", "personal information", "affiliate"],
+            "Arbitration Clauses": ["arbitration", "dispute", "binding arbitration", "forum"],
+            "Foreclosure Penalties": ["foreclosure", "collateral", "security interest"],
+            "Late Payment Fees": ["late payment", "late fee", "interest", "overdue"],
+            "Termination Clauses": ["terminate", "termination", "cancel", "suspend"],
+            "Standard Terms": [],
+        }
 
     def load_model(self):
+        if settings.LIGHTWEIGHT_ANALYSIS:
+            logger.info("LIGHTWEIGHT_ANALYSIS enabled. Using heuristic classifier.")
+            return
         if self.classifier is None:
             logger.info(f"Loading Legal Clause Classifier ({self.model_name})...")
             from transformers import pipeline
             self.classifier = pipeline("zero-shot-classification", model=self.model_name)
             logger.info("Classifier loaded.")
 
+    def heuristic_classify(self, clause_text: str):
+        text = clause_text.lower()
+        best_label = "Standard Terms"
+        best_score = 0.35
+
+        for label, keywords in self.keyword_map.items():
+            if not keywords:
+                continue
+
+            hits = sum(1 for keyword in keywords if keyword in text)
+            if hits:
+                score = min(0.45 + (hits * 0.15), 0.95)
+                if score > best_score:
+                    best_label = label
+                    best_score = score
+
+        return best_label, round(best_score, 2)
+
     def classify_clause(self, clause_text: str):
+        if settings.LIGHTWEIGHT_ANALYSIS:
+            return self.heuristic_classify(clause_text)
+
         if self.classifier is None:
             self.load_model()
             
@@ -44,6 +79,9 @@ class LegalClauseClassifier:
 
     def batch_classify(self, clauses: list):
         """Processes multiple clauses in a single optimized pass."""
+        if settings.LIGHTWEIGHT_ANALYSIS:
+            return [self.heuristic_classify(clause) for clause in clauses]
+
         if self.classifier is None:
             self.load_model()
         

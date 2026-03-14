@@ -1,5 +1,6 @@
 import logging
 # transformers is lazily imported inside load_model
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -23,16 +24,38 @@ class RiskScorer:
         }
 
     def load_model(self):
+        if settings.LIGHTWEIGHT_ANALYSIS:
+            logger.info("LIGHTWEIGHT_ANALYSIS enabled. Using heuristic risk scorer.")
+            return
         if self.scorer is None:
             logger.info(f"Loading Risk Scorer ({self.model_name})...")
             from transformers import pipeline
             self.scorer = pipeline("sentiment-analysis", model=self.model_name)
             logger.info("Scorer loaded.")
 
+    def heuristic_score(self, clause_text: str, clause_type: str) -> float:
+        text = clause_text.lower()
+        severity = 0.18
+
+        risky_terms = {
+            "high": ["sole discretion", "without notice", "non-refundable", "binding", "penalty", "liable"],
+            "medium": ["may", "automatically", "consent", "share", "terminate", "fee", "interest"],
+        }
+
+        severity += 0.18 * sum(1 for term in risky_terms["medium"] if term in text)
+        severity += 0.22 * sum(1 for term in risky_terms["high"] if term in text)
+
+        multiplier = self.risk_multiplier.get(clause_type, 1.0)
+        final_severity = min(severity * multiplier, 1.0)
+        return round(final_severity, 2)
+
     def calculate_severity(self, clause_text: str, clause_type: str) -> float:
         """
         Calculates a risk severity score (0.0 to 1.0) based on sentiment and clause type.
         """
+        if settings.LIGHTWEIGHT_ANALYSIS:
+            return self.heuristic_score(clause_text, clause_type)
+
         if self.scorer is None:
             self.load_model()
             
@@ -53,6 +76,9 @@ class RiskScorer:
         return round(final_severity, 2)
 
     def batch_calculate_severity(self, clauses: list, types: list) -> list:
+        if settings.LIGHTWEIGHT_ANALYSIS:
+            return [self.heuristic_score(clause, types[i]) for i, clause in enumerate(clauses)]
+
         if self.scorer is None:
             self.load_model()
         

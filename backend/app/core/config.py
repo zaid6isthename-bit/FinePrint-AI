@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     
     # Optional flags for ML model configuration
     USE_GPU: bool = False
+    LIGHTWEIGHT_ANALYSIS: bool = True
 
     model_config = SettingsConfigDict(
         env_file=".env", 
