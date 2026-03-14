@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from app.schemas.user import UserCreate, UserLogin, UserResponse
 from app.utils.auth import get_password_hash, verify_password, create_access_token
-from app.db.prisma import db
+from app.db.prisma import db, ensure_db_connected
 from datetime import timedelta
 from app.core.config import settings
 import logging
@@ -12,6 +12,7 @@ class AuthService:
     @staticmethod
     async def create_user(user_in: UserCreate) -> UserResponse:
         try:
+            await ensure_db_connected()
             # Check if user already exists
             existing_user = await db.user.find_unique(where={"email": user_in.email})
             if existing_user:
@@ -46,6 +47,7 @@ class AuthService:
     @staticmethod
     async def authenticate_user(user_in: UserLogin):
         try:
+            await ensure_db_connected()
             # Find user by email
             user = await db.user.find_unique(where={"email": user_in.email})
             

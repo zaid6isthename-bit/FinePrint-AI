@@ -1,6 +1,6 @@
 import asyncio
 from fastapi import UploadFile
-from app.db.prisma import db
+from app.db.prisma import db, ensure_db_connected
 from app.ml_models.text_extractor import PDFExtractor
 from app.ml_models.document_splitter import DocumentSplitter
 from app.ml_models.clause_classifier import clause_classifier
@@ -21,6 +21,7 @@ class DocumentService:
             import time
             start_time = time.time()
             logger.info(f"Starting neural audit for document {doc_id}")
+            await ensure_db_connected()
             
             # 1. Extract and Clean Text
             extract_start = time.time()
@@ -97,6 +98,7 @@ class DocumentService:
         except Exception as e:
             error_message = str(e)
             logger.error(f"FATAL ERROR during audit of {doc_id}: {error_message}", exc_info=True)
+            await ensure_db_connected()
             await db.document.update(
                 where={"id": doc_id},
                 data={

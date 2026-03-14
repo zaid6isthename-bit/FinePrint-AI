@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from app.core.config import settings
-from app.db.prisma import db
+from app.db.prisma import db, ensure_db_connected
 from app.schemas.user import UserResponse
 import json
 import base64
@@ -52,8 +52,7 @@ async def get_current_user(
         raise credentials_exception
     
     # Ensure database connection
-    if not db.is_connected():
-        await db.connect()
+    await ensure_db_connected()
     
     # Fetch user from database
     user = await db.user.find_unique(where={"id": user_id})
