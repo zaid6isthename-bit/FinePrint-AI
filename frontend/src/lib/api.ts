@@ -12,7 +12,7 @@ const getBaseURL = () => {
 
 const api = axios.create({
     baseURL: getBaseURL(),
-    withCredentials: true, // CRITICAL: Send cookies with every request so auth works
+    withCredentials: true, // CRITICAL: Send cookies with every request so auth works`r`n    timeout: 15000,
 });
 
 let isRedirecting = false;
@@ -48,3 +48,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+
