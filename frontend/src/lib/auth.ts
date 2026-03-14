@@ -15,6 +15,7 @@ declare module "next-auth" {
       image?: string | null;
       name?: string;
     };
+    accessToken?: string;
   }
 
   interface User {
@@ -23,6 +24,7 @@ declare module "next-auth" {
     firstName?: string;
     lastName?: string;
     image?: string | null;
+    accessToken?: string;
   }
 }
 
@@ -33,6 +35,7 @@ declare module "next-auth/jwt" {
     firstName?: string;
     lastName?: string;
     picture?: string;
+    accessToken?: string;
   }
 }
 
@@ -77,6 +80,7 @@ const providers: NextAuthOptions["providers"] = [
           image: user.image ?? null,
           firstName: user.firstName ?? undefined,
           lastName: user.lastName ?? undefined,
+          accessToken: data.access_token,
         };
       } catch (error) {
         console.error("Auth provider error:", error);
@@ -136,6 +140,7 @@ export const authOptions: NextAuthOptions = {
         token.firstName = user.firstName;
         token.lastName = user.lastName;
         token.picture = user.image;
+        token.accessToken = user.accessToken;
       }
 
       return token;
@@ -152,9 +157,9 @@ export const authOptions: NextAuthOptions = {
           .filter(Boolean)
           .join(" ") || token.email;
       }
+      session.accessToken = token.accessToken;
 
       return session;
     },
   },
 };
-

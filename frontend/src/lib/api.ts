@@ -1,5 +1,5 @@
 import axios from "axios";
-import { signOut } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 
 const getBaseURL = () => {
     const url = process.env.NEXT_PUBLIC_API_URL || "/api";
@@ -16,6 +16,20 @@ const api = axios.create({
 });
 
 let isRedirecting = false;
+
+api.interceptors.request.use(async (config) => {
+    if (typeof window === "undefined") {
+        return config;
+    }
+
+    const session = await getSession();
+    if (session?.accessToken) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${session.accessToken}`;
+    }
+
+    return config;
+});
 
 api.interceptors.response.use(
     (response) => response,
