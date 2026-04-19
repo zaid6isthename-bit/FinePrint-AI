@@ -15,14 +15,9 @@ chmod +x ./.prisma-binaries/* || true
 # Generate the Prisma client
 python -m prisma generate
 
-# Run db push - we'll add a timeout so it doesn't block the server indefinitely
+# Run db push synchronously (now using port 5432 for stability)
 echo "Step 1: Syncing database schema..."
-python -m prisma db push --skip-generate --accept-data-loss & 
-PUSH_PID=$!
-
-# Wait a few seconds for the push to start, then proceed to start the server 
-# so Render detects an open port immediately.
-sleep 5
+python -m prisma db push --skip-generate --accept-data-loss
 
 echo "Step 2: Starting FastAPI server..."
 exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000}

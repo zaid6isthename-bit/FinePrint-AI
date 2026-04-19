@@ -29,12 +29,30 @@ class AuthService:
                     "email": user_in.email,
                     "hashedPassword": hashed_password,
                     "firstName": user_in.firstName,
-                    "lastName": user_in.lastName
+                    "lastName": user_in.lastName,
+                    "clearanceLevel": "Level 1 // Operative"
                 }
             )
             
             logger.info(f"User created successfully: {new_user.email}")
             return UserResponse.from_orm(new_user)
+        except Exception as e:
+            # Check if it was a missing column error
+            if "clearanceLevel" in str(e):
+                logger.warning(f"Retrying user creation without clearanceLevel column...")
+                new_user = await db.user.create(
+                    data={
+                        "email": user_in.email,
+                        "hashedPassword": hashed_password,
+                        "firstName": user_in.firstName,
+                        "lastName": user_in.lastName
+                    }
+                )
+                # Manually set the field for the response
+                user_data = new_user.dict()
+                user_data["clearanceLevel"] = "Level 1 // Operative"
+                return UserResponse(**user_data)
+            raise e
         except HTTPException:
             raise
         except Exception as e:
@@ -73,24 +91,32 @@ class AuthService:
             )
 
             # Calculate Dynamic Clearance Level based on document count
-            doc_count = await db.document.count(where={"userId": user.id})
-            
-            # Simple level logic
-            new_level = "Level 1 // Operative"
-            if doc_count > 10:
-                new_level = "Level 4 // Master Auditor"
-            elif doc_count > 5:
-                new_level = "Level 3 // Senior Analyst"
-            elif doc_count > 2:
-                new_level = "Level 2 // Special Agent"
+            try:
+                doc_count = await db.document.count(where={"userId": user.id})
                 
-            # If level has changed, update it in DB
-            if user.clearanceLevel != new_level:
-                user = await db.user.update(
-                    where={"id": user.id},
-                    data={"clearanceLevel": new_level}
-                )
-                logger.info(f"User {user.email} promoted to {new_level}")
+                # Simple level logic
+                new_level = "Level 1 // Operative"
+                if doc_count > 10:
+                    new_level = "Level 4 // Master Auditor"
+                elif doc_count > 5:
+                    new_level = "Level 3 // Senior Analyst"
+                elif doc_count > 2:
+                    new_level = "Level 2 // Special Agent"
+                    
+                # If level has changed, update it in DB
+                # We check hasattr because the prisma client might not have the attribute yet in some cache states
+                current_level = getattr(user, "clearanceLevel", "Level 1 // Operative")
+                if current_level != new_level:
+                    user = await db.user.update(
+                        where={"id": user.id},
+                        data={"clearanceLevel": new_level}
+                    )
+                    logger.info(f"User {user.email} promoted to {new_level}")
+            except Exception as e:
+                # If the column doesn't exist yet, just log and continue with default
+                logger.warning(f"Could not update clearance level (column might be missing): {repr(e)}")
+                if not hasattr(user, "clearanceLevel"):
+                    setattr(user, "clearanceLevel", "Level 1 // Operative")
 
             logger.info(f"User authenticated successfully: {user.email}")
             
