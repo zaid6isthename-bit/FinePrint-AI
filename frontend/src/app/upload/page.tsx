@@ -63,13 +63,13 @@ export default function UploadPage() {
 
             const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData);
 
-            // Optimized transitions to meet the "exactly 2 seconds" requirement
+            // Optimized transitions to meet the visual requirement
             setTimeout(() => {
                 setStep("completed");
                 setTimeout(() => {
                     router.push(`/dashboard/${response.data.id}`);
-                }, 1000); // 1s show for speedometer
-            }, 1000); // 1s show for analysis theatre
+                }, 2000); // 2s show for speedometer
+            }, 5000); // 5s show for analysis theatre (to allow GLTF loading)
 
         } catch (error: any) {
             setStep("upload");

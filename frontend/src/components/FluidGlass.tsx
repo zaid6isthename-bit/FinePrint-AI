@@ -1,176 +1,99 @@
-/* eslint-disable react/no-unknown-property */
 "use client";
 
 import * as THREE from 'three';
-import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useState, useMemo, Suspense } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import {
-  useFBO,
-  useGLTF,
-  useScroll,
-  Image,
-  Scroll,
-  Preload,
-  ScrollControls,
   MeshTransmissionMaterial,
-  Text
+  Text,
+  Environment,
+  Float,
+  useGLTF
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }: any) {
-  const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
-  const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
-
-  const {
-    navItems = [
-      { label: 'Home', link: '' },
-      { label: 'About', link: '' },
-      { label: 'Contact', link: '' }
-    ],
-    ...modeProps
-  } = rawOverrides;
-
+export default function FluidGlass({ lensProps = {} }: any) {
   return (
-    <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-      <ScrollControls damping={0.2} pages={1} distance={0.4}>
-        <Wrapper modeProps={modeProps}>
-          <Scroll>
-            {/* Step 5: Document Preview Replacement */}
-            <DocumentPreview />
-          </Scroll>
-          <Scroll html />
-          <Preload />
-        </Wrapper>
-      </ScrollControls>
-    </Canvas>
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, minHeight: '600px' }}>
+      <Canvas 
+        camera={{ position: [0, 0, 20], fov: 35 }} 
+        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 2]}
+      >
+        <Suspense fallback={null}>
+          <ambientLight intensity={1} />
+          <pointLight position={[10, 10, 10]} intensity={2} color="#D9A441" />
+          <Environment preset="city" />
+          
+          <group>
+            {/* Document Sheet */}
+            <mesh position={[0, 0, -5]}>
+              <planeGeometry args={[14, 18]} />
+              <meshBasicMaterial color="#ffffff" opacity={0.15} transparent />
+            </mesh>
+            
+            <Text
+              position={[0, 6, -4.9]}
+              fontSize={0.6}
+              color="#D9A441"
+              font="https://fonts.gstatic.com/s/robotomono/v22/L0xuDF4xlVMF-BfR8bXMIhJHg45bgewp.woff"
+            >
+              PARSING_LEGAL_STRUCTURES...
+            </Text>
+
+            {/* Test Marker to confirm R3F is rendering */}
+            <mesh position={[-6, 8, -4.8]}>
+              <sphereGeometry args={[0.1]} />
+              <meshBasicMaterial color="red" />
+            </mesh>
+
+            {/* Lens */}
+            <MovingLens lensProps={lensProps} />
+          </group>
+        </Suspense>
+      </Canvas>
+    </div>
   );
 }
 
-const ModeWrapper = memo(function ModeWrapper({
-  children,
-  glb,
-  geometryKey,
-  lockToBottom = false,
-  followPointer = true,
-  modeProps = {},
-  ...props
-}: any) {
-  const ref = useRef<any>();
-  const { nodes } = useGLTF(glb) as any;
-  const buffer = useFBO();
-  const { viewport: vp } = useThree();
-  const [scene] = useState(() => new THREE.Scene());
-  const geoWidthRef = useRef(1);
+function MovingLens({ lensProps }: any) {
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const [target] = useState(() => new THREE.Vector3(0, 0, 2));
+  const [nextMove, setNextMove] = useState(0);
 
-  useEffect(() => {
-    const geo = nodes[geometryKey]?.geometry;
-    if (geo) {
-        geo.computeBoundingBox();
-        geoWidthRef.current = geo.boundingBox.max.x - geo.boundingBox.min.x || 1;
-    }
-  }, [nodes, geometryKey]);
+  // Safely load GLTF with fallback logic
+  const { nodes } = useGLTF("/assets/3d/lens.glb") as any;
 
   useFrame((state, delta) => {
-    const { gl, viewport, pointer, camera } = state;
-    const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
-
-    const destX = followPointer ? (pointer.x * v.width) / 2 : 0;
-    const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (pointer.y * v.height) / 2 : 0;
-    easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
-
-    if (modeProps.scale == null) {
-      const maxWorld = v.width * 0.9;
-      const desired = maxWorld / geoWidthRef.current;
-      ref.current.scale.setScalar(Math.min(0.25, desired));
+    const t = state.clock.getElapsedTime();
+    if (t > nextMove) {
+      target.set((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, 2);
+      setNextMove(t + 1 + Math.random() * 2);
     }
-
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
+    if (meshRef.current) {
+      easing.damp3(meshRef.current.position, target, 0.4, delta);
+      easing.dampE(meshRef.current.rotation, [target.y * 0.1, -target.x * 0.1, 0], 0.5, delta);
+    }
   });
 
-  const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps;
-
   return (
-    <>
-      {createPortal(children, scene)}
-      <mesh scale={[vp.width, vp.height, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
-      </mesh>
-      <mesh ref={ref} scale={scale ?? 0.25} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
-        <MeshTransmissionMaterial
-          buffer={buffer.texture}
-          ior={ior ?? 1.15}
-          thickness={thickness ?? 5}
-          anisotropy={anisotropy ?? 0.01}
-          chromaticAberration={chromaticAberration ?? 0.1}
-          {...extraMat}
+    <Float speed={4} rotationIntensity={0.5} floatIntensity={0.5}>
+      <mesh 
+        ref={meshRef} 
+        scale={2.5} 
+        geometry={nodes?.Cylinder?.geometry || new THREE.SphereGeometry(1, 32, 32)}
+      >
+        <MeshTransmissionMaterial 
+          thickness={10}
+          ior={1.15}
+          chromaticAberration={0.05}
+          anisotropy={0.1}
+          color="white"
+          transmission={1}
+          roughness={0}
+          {...lensProps} 
         />
       </mesh>
-    </>
-  );
-});
-
-function Lens({ modeProps, ...p }: any) {
-  return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />;
-}
-
-function Cube({ modeProps, ...p }: any) {
-  return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />;
-}
-
-function Bar({ modeProps = {}, ...p }: any) {
-  const defaultMat = {
-    transmission: 1,
-    roughness: 0,
-    thickness: 10,
-    ior: 1.15,
-    color: '#ffffff',
-    attenuationColor: '#ffffff',
-    attenuationDistance: 0.25
-  };
-
-  return (
-    <ModeWrapper
-      glb="/assets/3d/bar.glb"
-      geometryKey="Cube"
-      lockToBottom
-      followPointer={false}
-      modeProps={{ ...defaultMat, ...modeProps }}
-      {...p}
-    />
-  );
-}
-
-// Step 5 Replacement Component
-function DocumentPreview() {
-  return (
-    <group position={[0, 0, 12]}>
-      {/* Document Sheet */}
-      <mesh position={[0, 0, -1]}>
-        <planeGeometry args={[10, 14]} />
-        <meshBasicMaterial color="#ffffff" opacity={0.05} transparent />
-      </mesh>
-
-      <Text
-        position={[0, 5, 0]}
-        fontSize={0.4}
-        color="#D9A441"
-        font="https://fonts.gstatic.com/s/robotomono/v22/L0xuDF4xlVMF-BfR8bXMIhJHg45bgewp.woff"
-      >
-        ANALYSIS_UPLINK
-      </Text>
-
-      {/* Styled text lines rendered as mesh elements for refraction */}
-      {[...Array(15)].map((_, i) => (
-        <group key={i} position={[0, 3 - i * 0.6, 0]}>
-          <mesh>
-            <planeGeometry args={[Math.random() * 4 + 4, 0.1]} />
-            <meshBasicMaterial color={i % 4 === 0 ? "#D9A441" : "#ffffff"} opacity={0.3} transparent />
-          </mesh>
-        </group>
-      ))}
-    </group>
+    </Float>
   );
 }
