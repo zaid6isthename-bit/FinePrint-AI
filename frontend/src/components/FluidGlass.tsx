@@ -11,9 +11,9 @@ import {
 import { easing } from 'maath';
 
 export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
-  // We use a simplified ModeWrapper that renders a "Glass Bob" since 3D assets might not be available.
+  // We use a simplified ModeWrapper that renders a "Glass Bob" (Lens effect)
   const modeProps = {
-      scale: 2,
+      scale: 1.5,
       ior: 1.15,
       thickness: 5,
       chromaticAberration: 0.1,
@@ -38,22 +38,40 @@ const BobWrapper = memo(function BobWrapper({
   const buffer = useFBO();
   const { viewport: vp } = useThree();
   const [scene] = useState(() => new THREE.Scene());
+  
+  // Autonomous AI Eye logic state
+  const targetPos = useRef(new THREE.Vector2(0, 0));
+  const pauseUntil = useRef(0);
 
   useFrame((state, delta) => {
-    const { gl, viewport, pointer, camera } = state;
-    const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
-
-    // Bob floats and follows pointer slightly, simulating highlighting random parts 
-    // or we can add a time-based drift if pointer is idle
+    const { gl, camera } = state;
     const t = state.clock.getElapsedTime();
-    const destX = pointer.x !== 0 ? (pointer.x * v.width) / 2 : Math.sin(t) * 1.5;
-    const destY = pointer.y !== 0 ? (pointer.y * v.height) / 2 : Math.cos(t * 0.8) * 1.5;
-    
+
+    // Autonomous scanning mechanism
+    if (t > pauseUntil.current) {
+        // Pick a new target coordinate
+        targetPos.current.set(
+            (Math.random() - 0.5) * 4.5, // X bounds
+            (Math.random() - 0.5) * 6.5  // Y bounds
+        );
+        // Pause briefly upon arrival before moving next (simulating reading)
+        pauseUntil.current = t + 1.5 + Math.random() * 2.5; 
+    }
+
     if (ref.current) {
-        easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
-        // Add some rotation spin
-        ref.current.rotation.x += delta * 0.2;
-        ref.current.rotation.y += delta * 0.3;
+        // AI scanning fluid easing
+        easing.damp3(ref.current.position, [targetPos.current.x, targetPos.current.y, 1], 0.4, delta);
+        // Subtly rotate to simulate organic eye-tracking micro-movements
+        easing.dampE(
+            ref.current.rotation, 
+            [
+                (targetPos.current.y * 0.1), 
+                (-targetPos.current.x * 0.1), 
+                0
+            ], 
+            0.5, 
+            delta
+        );
     }
 
     gl.setRenderTarget(buffer);
@@ -70,15 +88,17 @@ const BobWrapper = memo(function BobWrapper({
         <planeGeometry />
         <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
-      <mesh ref={ref} scale={scale ?? 2} {...modeProps}>
-        {/* We use an Icosahedron to represent a multifaceted "glass bob" */}
-        <icosahedronGeometry args={[1, 4]} />
+      <mesh ref={ref} scale={scale ?? 1.5}>
+        {/* We use a flattened Sphere to tightly represent a magnifying lens */}
+        <sphereGeometry args={[1, 64, 64]} />
         <MeshTransmissionMaterial
           buffer={buffer.texture}
           ior={ior ?? 1.15}
           thickness={thickness ?? 5}
           anisotropy={anisotropy ?? 0.01}
           chromaticAberration={chromaticAberration ?? 0.1}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
           {...extraMat}
         />
       </mesh>
@@ -90,30 +110,33 @@ function DocumentPreview() {
   const { viewport } = useThree();
   
   return (
-    <group position={[0,0,10]}>
+    <group position={[0,0,-8]}>
         {/* Mock Document Backdrop */}
         <mesh position={[0, 0, -0.1]}>
-            <planeGeometry args={[viewport.width * 0.6, viewport.height * 0.8]} />
+            <planeGeometry args={[10, 14]} />
             <meshBasicMaterial color="#ffffff" />
         </mesh>
         
-        {/* Document Lines */}
-        {[...Array(12)].map((_, i) => (
-            <mesh key={i} position={[0, 3 - i * 0.6, 0.01]}>
-                <planeGeometry args={[Math.random() * 2 + 2, 0.15]} />
-                <meshBasicMaterial color={i % 4 === 0 ? "#D9A441" : "#1e293b"} />
-            </mesh>
-        ))}
-
+        {/* Glowing Header */}
         <Text
-          position={[0, 4, 0.02]}
-          fontSize={0.4}
+          position={[0, 5, 0.02]}
+          fontSize={0.8}
           color="#1e293b"
           anchorX="center"
           anchorY="middle"
+          font="https://fonts.gstatic.com/s/robotomono/v22/L0xuDF4xlVMF-BfR8bXMIhJHg45bgewp.woff"
         >
-          CONFIDENTIAL
+          ANALYSIS_UPLINK
         </Text>
+
+        {/* Document Formatting Lines */}
+        {[...Array(15)].map((_, i) => (
+            <mesh key={i} position={[-(Math.random() * 2), 3 - i * 0.7, 0.01]}>
+                <planeGeometry args={[Math.random() * 4 + 3, 0.2]} />
+                {/* Randomly inject some "found risk" colors mimicking analysis */}
+                <meshBasicMaterial color={i === 4 || i === 9 ? "#D9A441" : (i === 12 ? "#B85C5C" : "#cbd5e1")} />
+            </mesh>
+        ))}
     </group>
   );
 }
