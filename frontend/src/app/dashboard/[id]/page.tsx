@@ -14,6 +14,7 @@ import { AIPresence } from "@/components/AIPresence";
 import MobileDashboard from "@/components/MobileDashboard";
 import { BarristerLogo, BarristerTextLogo } from "@/components/Logo";
 import api from "@/lib/api";
+import AnimatedList from "@/components/AnimatedList";
 
 interface Clause {
     id: string;
@@ -267,35 +268,36 @@ export default function Dashboard() {
                         {/* Clause List */}
                         <div className="space-y-6">
                             <h3 className="text-[10px] font-mono font-bold tracking-[0.3em] text-muted-foreground/60 uppercase ml-4">Identified Clauses</h3>
-                            <div className="space-y-3 no-print">
-                                {data.clauses.map((clause, idx) => (
-                                    <motion.button
-                                        key={clause.id}
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.05 }}
-                                        onClick={() => setSelectedClause(clause)}
-                                        className={`w-full text-left p-6 rounded-sm transition-all border duration-500 group
-                                            ${selectedClause?.id === clause.id
-                                                ? `bg-gold/5 ${getRiskBorder(clause.riskLevel)} glow-gold shadow-lg`
-                                                : 'bg-transparent border-black/10 dark:border-white/10 hover:border-gold/20 hover:bg-gold/[0.02]'}
-                                        `}
-                                    >
-                                        <div className="flex justify-between items-start mb-3">
-                                            <span className={`text-[9px] font-mono font-bold tracking-[0.1em] uppercase py-1 ${getRiskColor(clause.riskLevel)}`}>
-                                                {clause.riskLevel} SEVERITY
-                                            </span>
-                                            {selectedClause?.id === clause.id && (
-                                                <div className="w-1 h-1 rounded-full bg-gold shadow-[0_0_8px_rgba(200,169,106,1)]" />
-                                            )}
-                                        </div>
-                                        <h4 className="text-foreground font-serif text-lg mb-2 flex items-center justify-between">
-                                            {clause.clauseType}
-                                            <ChevronRight className={`h-4 w-4 transition-transform text-gold/30 ${selectedClause?.id === clause.id ? 'translate-x-1 opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-                                        </h4>
-                                        <p className="text-muted-foreground/60 font-mono text-[10px] truncate uppercase tracking-tight italic">"{clause.originalText.slice(0, 50)}..."</p>
-                                    </motion.button>
-                                ))}
+                            <div className="no-print">
+                                <AnimatedList 
+                                    items={data.clauses}
+                                    displayScrollbar={false}
+                                    showGradients={true}
+                                    onItemSelect={(clause: any) => setSelectedClause(clause)}
+                                    renderItem={(clause: any, index: number, isSelected: boolean) => (
+                                        <button
+                                            className={`w-full text-left p-6 rounded-2xl transition-all border duration-500 group
+                                                ${isSelected
+                                                    ? `bg-gold/5 ${getRiskBorder(clause.riskLevel)} glow-gold shadow-lg`
+                                                    : 'bg-transparent border-black/10 dark:border-white/10 hover:border-gold/20 hover:bg-gold/[0.02]'}
+                                            `}
+                                        >
+                                            <div className="flex justify-between items-start mb-3">
+                                                <span className={`text-[9px] font-mono font-bold tracking-[0.1em] uppercase py-1 ${getRiskColor(clause.riskLevel)}`}>
+                                                    {clause.riskLevel} SEVERITY
+                                                </span>
+                                                {isSelected && (
+                                                    <div className="w-1 h-1 rounded-full bg-gold shadow-[0_0_8px_rgba(200,169,106,1)]" />
+                                                )}
+                                            </div>
+                                            <h4 className="text-foreground font-serif text-lg mb-2 flex items-center justify-between">
+                                                {clause.clauseType}
+                                                <ChevronRight className={`h-4 w-4 transition-transform text-gold/30 ${isSelected ? 'translate-x-1 opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                                            </h4>
+                                            <p className="text-muted-foreground/60 font-mono text-[10px] truncate uppercase tracking-tight italic">"{clause.originalText.slice(0, 50)}..."</p>
+                                        </button>
+                                    )}
+                                />
                             </div>
                         </div>
                     </section>

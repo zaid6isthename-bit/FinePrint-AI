@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { AIPresence } from "@/components/AIPresence";
 import MobileHistory from "@/components/MobileHistory";
 import api from "@/lib/api";
+import AnimatedList from "@/components/AnimatedList";
 
 interface DocHistory {
     id: string;
@@ -84,72 +85,71 @@ export default function HistoryPage() {
 
                 <div className="space-y-4">
                     {history.length > 0 ? (
-                        history.map((doc, idx) => (
-                            <motion.div
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05, ease: [0.22, 1, 0.36, 1], duration: 0.7 }}
-                                key={doc.id}
-                                className="group relative flex items-center justify-between p-8 rounded-sm bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-gold/30 transition-all duration-700 overflow-hidden shadow-lg shadow-black/5"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-r from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        <AnimatedList 
+                            items={history}
+                            displayScrollbar={false}
+                            showGradients={true}
+                            renderItem={(doc: any) => (
+                                <div className="group relative flex items-center justify-between p-8 rounded-2xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-gold/30 transition-all duration-700 overflow-hidden shadow-lg shadow-black/5">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-                                <div className="flex items-center gap-8 relative z-10">
-                                    <div className="w-14 h-14 rounded-sm bg-midnight/40 border border-black/5 dark:border-white/5 flex items-center justify-center group-hover:bg-gold/10 group-hover:border-gold/30 transition-all duration-700 shadow-inner">
-                                        <FileText className="h-6 w-6 text-zinc-500 group-hover:text-gold transition-colors" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-serif font-normal text-foreground tracking-tight mb-2">{doc.title}</h3>
-                                        <div className="flex items-center gap-6">
-                                            <span className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest text-zinc-600 uppercase">
-                                                <Calendar className="h-3 w-3 opacity-50" />
-                                                {new Date(doc.uploadDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                            </span>
-                                            <span className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest uppercase">
-                                                {doc.status === 'COMPLETED' ? (
-                                                    <span className="flex items-center gap-2 text-emerald-500/60">
-                                                        <Shield className="h-3 w-3" />
-                                                        Analyzed
-                                                    </span>
-                                                ) : (
-                                                    <span className="flex items-center gap-2 text-gold/60">
-                                                        <Clock className="h-3 w-3" />
-                                                        In Progress
-                                                    </span>
-                                                )}
-                                            </span>
+                                    <div className="flex items-center gap-8 relative z-10">
+                                        <div className="w-14 h-14 rounded-xl bg-midnight/40 border border-black/5 dark:border-white/5 flex items-center justify-center group-hover:bg-gold/10 group-hover:border-gold/30 transition-all duration-700 shadow-inner">
+                                            <FileText className="h-6 w-6 text-zinc-500 group-hover:text-gold transition-colors" />
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-12 relative z-10">
-                                    <div className="text-right hidden sm:block">
-                                        {doc.status === "COMPLETED" ? (
-                                            <div>
-                                                <div className="flex items-baseline justify-end">
-                                                    <span className={`text-4xl font-serif font-light tracking-tighter ${(doc.riskScore || 0) > 60 ? "text-red-400" : (doc.riskScore || 0) > 30 ? "text-gold" : "text-emerald-400"
-                                                        }`}>
-                                                        {Math.round(doc.riskScore || 0)}
-                                                    </span>
-                                                    <span className="text-[10px] font-mono font-bold text-zinc-600 ml-2 uppercase tracking-[0.3em]">Score</span>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="px-5 py-2 rounded-sm border border-gold/20 bg-gold/5">
-                                                <span className="text-[9px] font-mono font-bold text-gold uppercase tracking-widest">
-                                                    Processing...
+                                        <div>
+                                            <h3 className="text-xl font-serif font-normal text-foreground tracking-tight mb-2">{doc.title}</h3>
+                                            <div className="flex items-center gap-6">
+                                                <span className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest text-zinc-600 uppercase">
+                                                    <Calendar className="h-3 w-3 opacity-50" />
+                                                    {new Date(doc.uploadDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                </span>
+                                                <span className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-widest uppercase">
+                                                    {doc.status === 'COMPLETED' ? (
+                                                        <span className="flex items-center gap-2 text-emerald-500/60">
+                                                            <Shield className="h-3 w-3" />
+                                                            Analyzed
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-2 text-gold/60">
+                                                            <Clock className="h-3 w-3" />
+                                                            In Progress
+                                                        </span>
+                                                    )}
                                                 </span>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
-                                    <Link href={`/dashboard/${doc.id}`}>
-                                        <Button variant="ghost" className="h-14 w-14 p-0 rounded-sm hover:bg-gold/10 text-zinc-600 hover:text-gold border border-black/5 dark:border-white/5 hover:border-gold/30 group-hover:translate-x-1 transition-all duration-500">
-                                            <ArrowRight className="h-5 w-5" />
-                                        </Button>
-                                    </Link>
+
+                                    <div className="flex items-center gap-12 relative z-10">
+                                        <div className="text-right hidden sm:block">
+                                            {doc.status === "COMPLETED" ? (
+                                                <div>
+                                                    <div className="flex items-baseline justify-end">
+                                                        <span className={`text-4xl font-serif font-light tracking-tighter ${(doc.riskScore || 0) > 60 ? "text-red-400" : (doc.riskScore || 0) > 30 ? "text-gold" : "text-emerald-400"
+                                                            }`}>
+                                                            {Math.round(doc.riskScore || 0)}
+                                                        </span>
+                                                        <span className="text-[10px] font-mono font-bold text-zinc-600 ml-2 uppercase tracking-[0.3em]">Score</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="px-5 py-2 rounded-sm border border-gold/20 bg-gold/5">
+                                                    <span className="text-[9px] font-mono font-bold text-gold uppercase tracking-widest">
+                                                        Processing...
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <Link href={`/dashboard/${doc.id}`}>
+                                            <Button variant="ghost" className="h-14 w-14 p-0 rounded-xl hover:bg-gold/10 text-zinc-600 hover:text-gold border border-black/5 dark:border-white/5 hover:border-gold/30 group-hover:translate-x-1 transition-all duration-500">
+                                                <ArrowRight className="h-5 w-5" />
+                                            </Button>
+                                        </Link>
+                                    </div>
                                 </div>
-                            </motion.div>
-                        ))
+                            )}
+                        />
                     ) : (
                         <motion.div
                             initial={{ opacity: 0 }}
