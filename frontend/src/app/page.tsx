@@ -149,12 +149,12 @@ export default function Home() {
         </section>
 
         {/* ===================== TICKER / MARQUEE ===================== */}
-        <section className="bg-foreground dark:bg-white py-4 overflow-hidden">
+        <section className="bg-foreground dark:bg-zinc-900 py-6 overflow-hidden border-y border-black/5 dark:border-white/5">
           <div className="flex animate-marquee whitespace-nowrap">
             {[...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
-              <span key={i} className="mx-8 text-[11px] font-mono uppercase tracking-[0.2em] text-background/40 dark:text-foreground/40 flex items-center gap-6">
+              <span key={i} className="mx-8 text-[11px] font-mono uppercase tracking-[0.3em] text-background dark:text-zinc-400 flex items-center gap-6">
                 {item}
-                <span className="text-gold text-lg">◆</span>
+                <span className="text-gold text-lg opacity-60">◆</span>
               </span>
             ))}
           </div>
