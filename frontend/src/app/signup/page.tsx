@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Loader2, Mail, Lock, ArrowRight, UserPlus } from "lucide-react";
+import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +76,7 @@ export default function SignupPage() {
 
     return (
         <main className="min-h-screen flex items-center justify-center p-0 md:p-6 relative overflow-hidden bg-background grow">
+            <GlassFilter />
             {/* Mobile UI */}
             <div className="md:hidden w-full">
                 <MobileAuth 
@@ -105,7 +107,7 @@ export default function SignupPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="hidden md:block w-full max-w-md z-10"
             >
-                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-8 sm:p-10 shadow-2xl shadow-black/10 dark:shadow-black/40">
+                <GlassEffect className="p-8 sm:p-10 rounded-sm">
                         <div className="text-center mb-10">
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-[4px] bg-gold/10 border border-gold/20 mb-6">
                                 <UserPlus className="h-6 w-6 text-gold" />
@@ -195,7 +197,7 @@ export default function SignupPage() {
                                 </Link>
                             </p>
                         </div>
-                    </div>
+                </GlassEffect>
             </motion.div>
         </main>
     );

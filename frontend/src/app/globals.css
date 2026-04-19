@@ -209,3 +209,12 @@
 .animate-marquee {
   animation: marquee 20s linear infinite;
 }
+
+@keyframes moveBackground {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 0% -1000%;
+  }
+}
