@@ -63,13 +63,13 @@ export default function UploadPage() {
 
             const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData);
 
-            // Optimized transitions to meet the visual requirement
+            // Optimized transitions for the refined 3D engine
             setTimeout(() => {
                 setStep("completed");
                 setTimeout(() => {
                     router.push(`/dashboard/${response.data.id}`);
-                }, 2000); // 2s show for speedometer
-            }, 5000); // 5s show for analysis theatre (to allow GLTF loading)
+                }, 1500); // 1.5s show for speedometer
+            }, 2500); // 2.5s show for analysis theatre (optimized instant load)
 
         } catch (error: any) {
             setStep("upload");

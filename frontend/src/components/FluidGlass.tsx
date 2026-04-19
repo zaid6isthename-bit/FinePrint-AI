@@ -1,135 +1,241 @@
+/* eslint-disable react/no-unknown-property */
 "use client";
 
 import * as THREE from 'three';
-import { useRef, useState, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { MeshTransmissionMaterial, Text, Environment } from '@react-three/drei';
+import { useRef, useState, useEffect, memo, Suspense } from 'react';
+import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
+import {
+  useFBO,
+  useGLTF,
+  useScroll,
+  Image,
+  Scroll,
+  Preload,
+  ScrollControls,
+  MeshTransmissionMaterial,
+  Text
+} from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ lensProps = {} }: any) {
+export default function FluidGlass({ mode = 'lens', lensProps = {}, barProps = {}, cubeProps = {} }: any) {
+  const Wrapper = mode === 'bar' ? Bar : mode === 'cube' ? Cube : Lens;
+  const rawOverrides = mode === 'bar' ? barProps : mode === 'cube' ? cubeProps : lensProps;
+
+  const {
+    navItems = [
+      { label: 'Home', link: '' },
+      { label: 'About', link: '' },
+      { label: 'Contact', link: '' }
+    ],
+    ...modeProps
+  } = rawOverrides;
+
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
-      <Canvas
-        camera={{ position: [0, 0, 20], fov: 35 }}
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 2]}
-      >
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
         <Suspense fallback={null}>
-          <Scene lensProps={lensProps} />
+          <ScrollControls damping={0.2} pages={1} distance={0.4}>
+            {mode === 'bar' && <NavItems items={navItems} />}
+            <Wrapper modeProps={modeProps}>
+              <Scroll>
+                {/* Step 5: Document Preview Replacement */}
+                <DocumentPreview />
+              </Scroll>
+              <Scroll html />
+              <Preload />
+            </Wrapper>
+          </ScrollControls>
         </Suspense>
       </Canvas>
     </div>
   );
 }
 
-function Scene({ lensProps }: any) {
+const ModeWrapper = memo(function ModeWrapper({
+  children,
+  glb,
+  geometryKey,
+  lockToBottom = false,
+  followPointer = true,
+  modeProps = {},
+  ...props
+}: any) {
+  const ref = useRef<any>();
+  const { nodes } = useGLTF(glb) as any;
+  const buffer = useFBO();
+  const { viewport: vp } = useThree();
+  const [scene] = useState(() => new THREE.Scene());
+  const geoWidthRef = useRef(1);
+
+  useEffect(() => {
+    const geo = nodes[geometryKey]?.geometry;
+    if (geo) {
+      geo.computeBoundingBox();
+      geoWidthRef.current = geo.boundingBox.max.x - geo.boundingBox.min.x || 1;
+    }
+  }, [nodes, geometryKey]);
+
+  useFrame((state, delta) => {
+    const { gl, viewport, pointer, camera } = state;
+    const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
+
+    const destX = followPointer ? (pointer.x * v.width) / 2 : 0;
+    const destY = lockToBottom ? -v.height / 2 + 0.2 : followPointer ? (pointer.y * v.height) / 2 : 0;
+    easing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);
+
+    if (modeProps.scale == null) {
+      const maxWorld = v.width * 0.9;
+      const desired = maxWorld / geoWidthRef.current;
+      ref.current.scale.setScalar(Math.min(0.25, desired));
+    }
+
+    gl.setRenderTarget(buffer);
+    gl.render(scene, camera);
+    gl.setRenderTarget(null);
+
+    // Adapted background for Midnight theme
+    gl.setClearColor(0x0e0f12, 0); 
+  });
+
+  const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps;
+
   return (
     <>
-      <ambientLight intensity={1.5} />
-      <pointLight position={[10, 10, 10]} intensity={2} color="#D9A441" />
-      <Environment preset="city" />
-
-      {/* Background plane — gives transmission material something to refract */}
-      <mesh position={[0, 0, -6]}>
-        <planeGeometry args={[30, 30]} />
-        <meshBasicMaterial color="#0d0d10" />
+      {createPortal(children, scene)}
+      <mesh scale={[vp.width, vp.height, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
-
-      {/* Document lines */}
-      <DocumentLines />
-
-      {/* Lens — no GLB dependency */}
-      <MovingLens lensProps={lensProps} />
+      <mesh ref={ref} scale={scale ?? 0.25} rotation-x={Math.PI / 2} geometry={nodes[geometryKey]?.geometry} {...props}>
+        <MeshTransmissionMaterial
+          buffer={buffer.texture}
+          ior={ior ?? 1.15}
+          thickness={thickness ?? 5}
+          anisotropy={anisotropy ?? 0.01}
+          chromaticAberration={chromaticAberration ?? 0.1}
+          {...extraMat}
+        />
+      </mesh>
     </>
+  );
+});
+
+function Lens({ modeProps, ...p }: any) {
+  return <ModeWrapper glb="/assets/3d/lens.glb" geometryKey="Cylinder" followPointer modeProps={modeProps} {...p} />;
+}
+
+function Cube({ modeProps, ...p }: any) {
+  return <ModeWrapper glb="/assets/3d/cube.glb" geometryKey="Cube" followPointer modeProps={modeProps} {...p} />;
+}
+
+function Bar({ modeProps = {}, ...p }: any) {
+  const defaultMat = {
+    transmission: 1,
+    roughness: 0,
+    thickness: 10,
+    ior: 1.15,
+    color: '#ffffff',
+    attenuationColor: '#ffffff',
+    attenuationDistance: 0.25
+  };
+
+  return (
+    <ModeWrapper
+      glb="/assets/3d/bar.glb"
+      geometryKey="Cube"
+      lockToBottom
+      followPointer={false}
+      modeProps={{ ...defaultMat, ...modeProps }}
+      {...p}
+    />
   );
 }
 
-function DocumentLines() {
-  const lines = [
-    { pos: [-3, 6, -4], w: 6, label: "SERVICE AGREEMENT — SECTION 4.2" },
-    { pos: [-3, 5, -4], w: 5, label: "Indemnification & Liability" },
-    { pos: [-3, 3.5, -4], w: 4.5, label: "The Client shall indemnify and hold harmless..." },
-    { pos: [-3, 2.8, -4], w: 5.5, label: "...including reasonable attorneys fees, arising from..." },
-    { pos: [-3, 2.1, -4], w: 3.8, label: "...breach of representations herein." },
-    { pos: [-3, 0.8, -4], w: 4.2, label: "TERMINATION CLAUSE — 30 days written notice" },
-    { pos: [-3, 0.1, -4], w: 5.2, label: "Either party may terminate this agreement upon..." },
-    { pos: [-3, -0.6, -4], w: 3.5, label: "...without cause, subject to obligations." },
-    { pos: [-3, -2, -4], w: 4.8, label: "PAYMENT TERMS — Net 30" },
-    { pos: [-3, -2.7, -4], w: 5, label: "Invoices are due within thirty (30) calendar days..." },
-    { pos: [-3, -3.4, -4], w: 3.2, label: "...late fees of 1.5% per month apply." },
-    { pos: [-3, -5, -4], w: 4, label: "ARBITRATION — Binding arbitration clause" },
-    { pos: [-3, -5.7, -4], w: 5.3, label: "Disputes shall be resolved by arbitration per..." },
-  ];
+function NavItems({ items }: any) {
+  const group = useRef<any>();
+  const { viewport, camera } = useThree();
+
+  const DEVICE = {
+    mobile: { max: 639, spacing: 0.2, fontSize: 0.035 },
+    tablet: { max: 1023, spacing: 0.24, fontSize: 0.035 },
+    desktop: { max: Infinity, spacing: 0.3, fontSize: 0.035 }
+  } as any;
+  const getDevice = () => {
+    if (typeof window === 'undefined') return 'desktop';
+    const w = window.innerWidth;
+    return w <= DEVICE.mobile.max ? 'mobile' : w <= DEVICE.tablet.max ? 'tablet' : 'desktop';
+  };
+
+  const [device, setDevice] = useState(getDevice());
+
+  useEffect(() => {
+    const onResize = () => setDevice(getDevice());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const { spacing, fontSize } = DEVICE[device];
+
+  useFrame(() => {
+    if (!group.current) return;
+    const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
+    group.current.position.set(0, -v.height / 2 + 0.2, 15.1);
+
+    group.current.children.forEach((child: any, i: number) => {
+      child.position.x = (i - (items.length - 1) / 2) * spacing;
+    });
+  });
 
   return (
-    <group>
-      {/* White paper background */}
-      <mesh position={[0, 0, -4.5]}>
-        <planeGeometry args={[14, 18]} />
-        <meshBasicMaterial color="#f8f6f0" />
-      </mesh>
-
-      {lines.map((line, i) => (
-        <group key={i}>
-          <mesh position={[line.pos[0] + line.w / 2, line.pos[1], line.pos[2] - 0.01]}>
-            <planeGeometry args={[line.w, i === 0 || i === 5 || i === 8 || i === 11 ? 0.25 : 0.12]} />
-            <meshBasicMaterial
-              color={i === 0 || i === 5 || i === 8 || i === 11 ? "#1a1a2e" : "#555577"}
-              opacity={i === 0 || i === 5 || i === 8 || i === 11 ? 1 : 0.6}
-              transparent
-            />
-          </mesh>
-        </group>
+    <group ref={group} renderOrder={10}>
+      {items.map(({ label }: any) => (
+        <Text
+          key={label}
+          fontSize={fontSize}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+          depthWrite={false}
+          outlineWidth={0}
+          outlineBlur="20%"
+          outlineColor="#000"
+          outlineOpacity={0.5}
+          depthTest={false}
+          renderOrder={10}
+        >
+          {label}
+        </Text>
       ))}
     </group>
   );
 }
 
-function MovingLens({ lensProps }: any) {
-  const meshRef = useRef<THREE.Mesh>(null!);
-  const target = useRef(new THREE.Vector3(0, 0, 2));
-  const nextMove = useRef(0);
-
-  // Waypoints that hover over document zones
-  const waypoints = [
-    [0, 6], [-1, 5], [1, 3.5], [0, 0.8],
-    [-1, -0.6], [0, -2], [1, -3.4], [-1, -5],
-    [2, 2], [-2, -1], [0, 4],
-  ];
-  const wpIdx = useRef(0);
-
-  useFrame((state, delta) => {
-    const t = state.clock.getElapsedTime();
-    if (t > nextMove.current) {
-      const wp = waypoints[wpIdx.current % waypoints.length];
-      target.current.set(
-        wp[0] + (Math.random() - 0.5) * 1.5,
-        wp[1] + (Math.random() - 0.5) * 0.8,
-        2
-      );
-      wpIdx.current++;
-      nextMove.current = t + 1.5 + Math.random() * 2;
-    }
-
-    if (meshRef.current) {
-      easing.damp3(meshRef.current.position, target.current, 0.6, delta);
-    }
-  });
-
+// Custom Document Preview inside the lens scene
+function DocumentPreview() {
   return (
-    <mesh ref={meshRef} scale={2.5}>
-      {/* Cylinder geometry — mimics the lens.glb shape */}
-      <cylinderGeometry args={[1, 1, 0.3, 64]} />
-      <MeshTransmissionMaterial
-        thickness={5}
-        ior={1.15}
-        chromaticAberration={0.08}
-        anisotropy={0.1}
-        transmission={1}
-        roughness={0}
-        color="white"
-        {...lensProps}
-      />
-    </mesh>
+    <group position={[0, 0, 12]}>
+      <mesh position={[0, 0, -1]}>
+        <planeGeometry args={[10, 14]} />
+        <meshBasicMaterial color="#ffffff" opacity={0.05} transparent />
+      </mesh>
+
+      <Text
+        position={[0, 5, 0]}
+        fontSize={0.4}
+        color="#D9A441"
+        font="https://fonts.gstatic.com/s/robotomono/v22/L0xuDF4xlVMF-BfR8bXMIhJHg45bgewp.woff"
+      >
+        ANALYSIS_UPLINK
+      </Text>
+
+      {[...Array(15)].map((_, i) => (
+        <group key={i} position={[0, 3 - i * 0.6, 0]}>
+          <mesh>
+            <planeGeometry args={[Math.random() * 4 + 4, 0.1]} />
+            <meshBasicMaterial color={i % 4 === 0 ? "#D9A441" : "#ffffff"} opacity={0.3} transparent />
+          </mesh>
+        </group>
+      ))}
+    </group>
   );
 }
