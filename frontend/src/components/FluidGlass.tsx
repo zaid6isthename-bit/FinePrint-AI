@@ -14,11 +14,13 @@ import { easing } from 'maath';
 export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
   // We use a simplified ModeWrapper that renders a "Glass Bob" (Lens effect)
   const modeProps = {
-      scale: 1.5,
+      scale: 0.15,
       ior: 1.15,
-      thickness: 5,
-      chromaticAberration: 0.1,
+      thickness: 10,
+      chromaticAberration: 0.05,
       anisotropy: 0.01,
+      roughness: 0,
+      transmission: 1,
       ...lensProps
   };
 
@@ -89,15 +91,17 @@ const BobWrapper = memo(function BobWrapper({
         <planeGeometry />
         <meshBasicMaterial map={buffer.texture} transparent />
       </mesh>
-      <mesh ref={ref} scale={scale ?? 1.5}>
+      <mesh ref={ref} scale={scale ?? 0.15}>
         {/* We use a flattened Sphere to tightly represent a magnifying lens */}
         <sphereGeometry args={[1, 64, 64]} />
         <MeshTransmissionMaterial
           buffer={buffer.texture}
           ior={ior ?? 1.15}
-          thickness={thickness ?? 5}
+          thickness={thickness ?? 10}
           anisotropy={anisotropy ?? 0.01}
-          chromaticAberration={chromaticAberration ?? 0.1}
+          chromaticAberration={chromaticAberration ?? 0.05}
+          roughness={extraMat.roughness ?? 0}
+          transmission={extraMat.transmission ?? 1}
           clearcoat={1}
           clearcoatRoughness={0.1}
           {...extraMat}
