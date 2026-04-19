@@ -54,8 +54,8 @@ export default function Home() {
         {/* ===================== HERO SECTION ===================== */}
         <section className="relative min-h-screen flex items-center pt-[68px] bg-[#F2EFE9] dark:bg-[#0E0F12] overflow-hidden">
           {/* Ambient glow */}
-          <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(200,169,106,0.1)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" />
-          <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.06)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse" style={{ animationDelay: "4s" }} />
+          <div className="absolute top-[-200px] right-[-100px] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(200,169,106,0.1)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse pointer-events-none" />
+          <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(80,100,160,0.06)_0%,transparent_70%)] blur-[120px] rounded-full animate-brain-pulse pointer-events-none" style={{ animationDelay: "4s" }} />
 
           <div className="max-w-7xl mx-auto px-12 w-full grid grid-cols-2 gap-16 items-center">
             {/* Left - Content */}
@@ -80,19 +80,15 @@ export default function Home() {
               </p>
 
               <div className="flex items-center gap-4">
-                <Link href="/upload">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-                    <Button size="lg" className="h-14 px-10 text-[10px] font-mono font-bold tracking-[0.15em] bg-gold/15 hover:bg-gold/20 text-gold rounded-sm border border-gold/30 uppercase transition-all duration-500 shadow-2xl shadow-gold/10 glow-gold group">
-                      Analyze Your Contract
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </motion.div>
-                </Link>
-                <a href="#features">
-                  <Button size="lg" variant="outline" className="h-14 px-8 text-[10px] font-mono font-bold tracking-[0.15em] rounded-sm border-border text-muted-foreground hover:border-gold/30 hover:text-gold uppercase transition-all">
-                    See How It Works
-                  </Button>
-                </a>
+                <Button asChild size="lg" className="h-14 px-10 text-[10px] font-mono font-bold tracking-[0.15em] bg-gold/15 hover:bg-gold/20 text-gold rounded-sm border border-gold/30 uppercase transition-all duration-500 shadow-2xl shadow-gold/10 glow-gold group">
+                  <Link href="/upload">
+                    Analyze Your Contract
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="h-14 px-8 text-[10px] font-mono font-bold tracking-[0.15em] rounded-sm border-border text-muted-foreground hover:border-gold/30 hover:text-gold uppercase transition-all">
+                  <a href="#features">See How It Works</a>
+                </Button>
               </div>
             </motion.div>
 
