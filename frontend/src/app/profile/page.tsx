@@ -66,6 +66,7 @@ export default function ProfilePage() {
                                 </div>
                                 <h1 className="text-2xl font-serif font-light text-foreground">{user?.firstName} {user?.lastName}</h1>
                                 <p className="text-[10px] font-mono text-gold tracking-widest uppercase mt-2 opacity-60">Operative ID: {user?.id.slice(0, 12)}</p>
+                            </div>
                         </div>
 
                         <Button 
