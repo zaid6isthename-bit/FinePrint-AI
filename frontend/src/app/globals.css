@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
+
+@layer base {
+  :root {
+    --background: 40 10% 98%; /* Slightly cooler, cleaner white */
+    --foreground: 220 20% 12%; /* Deep charcoal, almost midnight */
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 12%;
+    --primary: 40 40% 40%; /* Sophisticated darker gold/brass */
+    --primary-foreground: 40 20% 98%;
+    --secondary: 40 15% 94%;
+    --secondary-foreground: 220 20% 12%;
+    --muted: 0 0% 95% / 0.7;
+    --muted-foreground: 220 10% 45%;
+    --accent: 40 40% 40%;
+    --accent-foreground: 40 20% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 10% 88%;
+    --input: 220 10% 88%;
+    --ring: 40 40% 40%;
+    --radius: 0.25rem;
+
+    /* Adaptive Brand Tokens */
+    --midnight: #FBF9F6; /* Premium off-white/linen */
+    --midnight-rgb: 251, 249, 246;
+    --gold: #A68A4F;
+    --gold-rgb: 166, 138, 79;
+    --text: #1A1B1E;
+    --muted-color: #64748B;
+
+    /* Risk Colors */
+    --low: 142 71% 45%;
+    --moderate: 38 92% 50%;
+    --high: 0 84% 60%;
+
+    /* Light Theme Glass & Scroll */
+    --glass-bg: rgba(255, 255, 255, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --scroll-thumb: rgba(0, 0, 0, 0.1);
+    --scroll-thumb-hover: rgba(0, 0, 0, 0.2);
+  }
+
+  .dark {
+    --background: 220 15% 6%;
+    --foreground: 220 4% 92%;
+    --card: 222 15% 13%;
+    --card-foreground: 220 4% 92%;
+    --popover: 225 15% 6%;
+    --popover-foreground: 220 4% 92%;
+    --primary: 40 49% 60%;
+    --primary-foreground: 225 15% 6%;
+    --secondary: 222 15% 15%;
+    --secondary-foreground: 220 4% 92%;
+    --muted: 222 15% 13%;
+    --muted-foreground: 228 6% 67%;
+    --accent: 40 49% 60%;
+    --accent-foreground: 225 15% 6%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 222 15% 18%;
+    --input: 222 15% 18%;
+    --ring: 40 49% 60%;
+
+    /* Dark Brand Tokens */
+    --midnight: #0E0F12;
+    --midnight-rgb: 14, 15, 18;
+    --gold: #C8A96A;
+    --gold-rgb: 200, 169, 106;
+    --text: #E8E9EB;
+    --muted-color: #A6A9B0;
+
+    /* Risk Colors Dark */
+    --low: 129 21% 53%;
+    --moderate: 39 67% 55%;
+    --high: 0 41% 54%;
+
+    /* Dark Theme Glass & Scroll */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --scroll-thumb: rgba(255, 255, 255, 0.1);
+    --scroll-thumb-hover: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: var(--midnight);
+  }
+
+  @media (min-width: 768px) {
+    body.custom-cursor {
+      cursor: none;
+    }
+  }
+}
+
+/* Midnight Counsel Glass Component Styles */
+.glass-pane {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 4px;
+}
+
+.glass-pane-gold {
+  background: rgba(200, 169, 106, 0.08);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(200, 169, 106, 0.3);
+  border-radius: 4px;
+}
+
+.glow-gold {
+  box-shadow: 0 0 40px -5px rgba(200, 169, 106, 0.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--scroll-thumb);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scroll-thumb-hover);
+}
+
+/* Animation Utilities */
+@keyframes brain-pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+    filter: blur(80px);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+    filter: blur(100px);
+  }
+}
+
+.animate-brain-pulse {
+  animation: brain-pulse 8s ease-in-out infinite;
+}
+
+@keyframes scan-sweep {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.scan-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  animation: scan-sweep 3s ease-in-out infinite;
+}

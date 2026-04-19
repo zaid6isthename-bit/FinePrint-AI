@@ -1,0 +1,7 @@
+This is a dummy test agreement.
+1. The user agrees to pay a monthly fee of $50 for access to the Gym facilities.
+2. In the event of late payment, the user will be penalized $200 per day until the balance is paid.
+3. This agreement will automatically renew for 12 months unless canceled 60 days before the renewal date.
+4. The user agrees to waive their right to trial and submit all disputes to binding arbitration.
+5. The Gym reserves the right to terminate this agreement at any time without notice.
+6. The user agrees to allow their personal data, including health metrics, to be shared with third-party marketing affiliates.
