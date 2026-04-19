@@ -24,6 +24,9 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: "Barrister AI - Legal Agreement Risk Analyzer",
   description: "Detect hidden clauses and get a risk score from user-uploaded legal agreements.",
+  verification: {
+    google: "N7Z039UzNlYwdnXV2pTiryb9zsX6wNshoNYJpPgH9NQ",
+  },
 };
 
 export default function RootLayout({
