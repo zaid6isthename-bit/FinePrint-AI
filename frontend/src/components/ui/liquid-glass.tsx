@@ -40,20 +40,20 @@ export const GlassEffect: React.FC<GlassEffectProps> = ({
       <div
         className="absolute inset-0 z-0 overflow-hidden rounded-inherit"
         style={{
-          backdropFilter: "blur(3px)",
+          backdropFilter: "blur(1px)",
           filter: "url(#glass-distortion)",
           isolation: "isolate",
         }}
       />
       <div
         className="absolute inset-0 z-10 rounded-inherit"
-        style={{ background: "rgba(255, 255, 255, 0.25)" }}
+        style={{ background: "rgba(255, 255, 255, 0.01)" }}
       />
       <div
         className="absolute inset-0 z-20 rounded-inherit overflow-hidden"
         style={{
           boxShadow:
-            "inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5), inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5)",
+            "inset 1px 1px 0px 0 rgba(255, 255, 255, 0.05), inset -1px -1px 0px 0px rgba(255, 255, 255, 0.05)",
         }}
       />
 

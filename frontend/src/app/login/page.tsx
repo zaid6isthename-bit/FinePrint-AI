@@ -95,7 +95,7 @@ export default function LoginPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="hidden md:block w-full max-w-md z-10"
             >
-                <GlassEffect className="p-8 sm:p-10 rounded-sm">
+                <GlassEffect className="p-8 sm:p-10 rounded-3xl">
                         <div className="text-center mb-10">
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-[4px] bg-gold/10 border border-gold/20 mb-6">
                                 <Shield className="h-6 w-6 text-gold" />
