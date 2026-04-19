@@ -68,7 +68,7 @@ export default function LoginPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-0 md:p-6 relative overflow-hidden bg-transparent grow">
+        <main className="min-h-screen flex items-center justify-center p-0 md:p-6 relative overflow-hidden bg-background grow">
             {/* Mobile UI */}
             <div className="md:hidden w-full">
                 <MobileAuth 
@@ -93,8 +93,7 @@ export default function LoginPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="hidden md:block w-full max-w-md z-10"
             >
-                <div className="glass-pane p-1 shadow-2xl shadow-black/50">
-                    <div className="bg-background/40 p-8 sm:p-10 rounded-sm">
+                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-8 sm:p-10 shadow-2xl shadow-black/10 dark:shadow-black/40">
                         <div className="text-center mb-10">
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-[4px] bg-gold/10 border border-gold/20 mb-6">
                                 <Shield className="h-6 w-6 text-gold" />
@@ -114,7 +113,7 @@ export default function LoginPage() {
                                         placeholder="expert@barrister.ai"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="pl-12 h-13 bg-background/30 border-black/5 dark:border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        className="pl-12 h-13 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/40 font-mono text-xs"
                                         required
                                     />
                                 </div>
@@ -132,7 +131,7 @@ export default function LoginPage() {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="pl-12 h-13 bg-midnight/30 border-black/5 dark:border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        className="pl-12 h-13 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/40 font-mono text-xs"
                                         required
                                     />
                                 </div>
@@ -166,7 +165,6 @@ export default function LoginPage() {
                             </p>
                         </div>
                     </div>
-                </div>
             </motion.div>
         </main>
     );

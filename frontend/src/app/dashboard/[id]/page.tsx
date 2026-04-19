@@ -145,7 +145,7 @@ export default function Dashboard() {
     if (error || data?.status === 'FAILED') {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6">
-                <div className="glass-pane p-12 max-w-md text-center">
+                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-12 max-w-md text-center shadow-lg shadow-black/5">
                     <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-6" />
                     <h2 className="text-2xl font-serif text-foreground mb-4">{error ? "Uplink Error" : "Analysis Failed"}</h2>
                     <p className="text-muted-foreground font-light mb-4 italic">
@@ -213,7 +213,7 @@ export default function Dashboard() {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="glass-pane p-12 rounded-sm flex flex-col items-center text-center relative overflow-hidden group shadow-2xl shadow-black/50"
+                            className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-12 flex flex-col items-center text-center relative overflow-hidden group shadow-lg shadow-black/5 dark:shadow-black/40"
                         >
                             <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
                             <h3 className="text-[10px] font-mono font-bold tracking-[0.3em] text-muted-foreground/60 uppercase mb-10">Architectural Risk Score</h3>
@@ -278,7 +278,7 @@ export default function Dashboard() {
                                         className={`w-full text-left p-6 rounded-sm transition-all border duration-500 group
                                             ${selectedClause?.id === clause.id
                                                 ? `bg-gold/5 ${getRiskBorder(clause.riskLevel)} glow-gold shadow-lg`
-                                                : 'bg-white/40 dark:bg-midnight/20 border-black/5 dark:border-white/5 backdrop-blur-sm hover:border-gold/20 hover:bg-gold/[0.02]'}
+                                                : 'bg-transparent border-black/10 dark:border-white/10 hover:border-gold/20 hover:bg-gold/[0.02]'}
                                         `}
                                     >
                                         <div className="flex justify-between items-start mb-3">
@@ -310,7 +310,7 @@ export default function Dashboard() {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -15, filter: "blur(10px)" }}
                                     transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                                    className="glass-pane p-14 rounded-sm flex-1 relative overflow-hidden shadow-2xl shadow-black/80"
+                                    className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 p-14 rounded-sm flex-1 relative overflow-hidden shadow-xl shadow-black/10 dark:shadow-black/40"
                                 >
                                     <div className="flex items-center gap-6 mb-12">
                                         <div className={`w-16 h-16 rounded-sm flex items-center justify-center bg-gold/5 border border-gold/20 shadow-xl shadow-gold/5`}>
@@ -328,7 +328,7 @@ export default function Dashboard() {
                                                 <h4 className="text-[10px] font-mono font-bold tracking-[0.2em] text-muted-foreground/60 uppercase mb-5 flex items-center gap-2">
                                                     <FileIcon className="h-3 w-3 text-gold/50" /> Original Forensic Text
                                                 </h4>
-                                                <div className="bg-white/40 dark:bg-card/60 p-10 rounded-sm border border-black/5 dark:border-white/5 backdrop-blur-md font-serif text-muted-foreground text-lg leading-relaxed italic border-l-2 border-l-gold/30 shadow-inner">
+                                                <div className="bg-transparent p-10 rounded-sm border border-black/10 dark:border-white/10 font-serif text-muted-foreground text-lg leading-relaxed italic border-l-2 border-l-gold/30 shadow-inner">
                                                     "{selectedClause.originalText}"
                                                 </div>
                                             </section>
@@ -347,11 +347,11 @@ export default function Dashboard() {
                                                 </section>
 
                                                 <div className="flex flex-col gap-4">
-                                                    <div className="bg-white/40 dark:bg-midnight/30 p-6 rounded-sm border border-black/5 dark:border-white/5 backdrop-blur-sm">
+                                                    <div className="bg-transparent p-6 rounded-sm border border-black/10 dark:border-white/10">
                                                         <span className="text-[9px] font-mono tracking-widest text-muted-foreground/60 uppercase block mb-2">Confidence Level</span>
                                                         <span className="text-2xl font-serif text-foreground">99.782%</span>
                                                     </div>
-                                                    <div className="bg-white/40 dark:bg-card/60 p-6 rounded-sm border border-black/5 dark:border-white/5 backdrop-blur-sm">
+                                                    <div className="bg-transparent p-6 rounded-sm border border-black/10 dark:border-white/10">
                                                         <span className="text-[9px] font-mono tracking-widest text-muted-foreground/60 uppercase block mb-2">Precedent Match</span>
                                                         <span className="text-2xl font-serif text-foreground italic">High-Fidelity</span>
                                                     </div>
@@ -361,7 +361,7 @@ export default function Dashboard() {
                                     </div>
                                 </motion.div>
                             ) : (
-                                <div className="glass-pane rounded-sm flex-1 flex flex-col items-center justify-center text-center p-20 border-dashed border-black/5 dark:border-white/5">
+                                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm flex-1 flex flex-col items-center justify-center text-center p-20 border-dashed border-black/10 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/20">
                                     <AIPresence status="idle" className="mb-10 opacity-20" />
                                     <p className="text-muted-foreground/60 font-mono tracking-[0.4em] uppercase text-[10px]">Awaiting forensic focus</p>
                                 </div>
@@ -373,7 +373,7 @@ export default function Dashboard() {
                             initial={{ opacity: 0, y: 15 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.4 }}
-                            className="glass-pane p-12 rounded-sm relative overflow-hidden shadow-2xl shadow-black"
+                            className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 p-12 rounded-sm relative overflow-hidden shadow-xl shadow-black/10 dark:shadow-black/40"
                         >
                             <div className="flex items-center justify-between mb-10 no-print">
                                 <div>

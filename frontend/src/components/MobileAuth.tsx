@@ -77,7 +77,7 @@ export default function MobileAuth({
               placeholder="email@domain.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-transparent border-b border-white/10 border-t-0 border-r-0 border-l-0 pl-8 h-12 rounded-none text-sm font-mono focus:ring-0 focus:border-b-gold transition-all"
+              className="bg-transparent border-b border-black/10 dark:border-white/10 border-t-0 border-r-0 border-l-0 pl-8 h-12 rounded-none text-sm font-mono focus:ring-0 focus:border-b-gold transition-all text-foreground"
               required
             />
           </div>
@@ -93,7 +93,7 @@ export default function MobileAuth({
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-transparent border-b border-white/10 border-t-0 border-r-0 border-l-0 pl-8 h-12 rounded-none text-sm font-mono focus:ring-0 focus:border-b-gold transition-all"
+                className="bg-transparent border-b border-black/10 dark:border-white/10 border-t-0 border-r-0 border-l-0 pl-8 h-12 rounded-none text-sm font-mono focus:ring-0 focus:border-b-gold transition-all text-foreground"
                 required
               />
             </div>

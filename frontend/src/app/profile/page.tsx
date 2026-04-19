@@ -50,8 +50,8 @@ export default function ProfilePage() {
                         animate={{ opacity: 1, x: 0 }}
                         className="w-full md:w-80 space-y-6"
                     >
-                        <div className="glass-pane p-1 shadow-2xl shadow-black/40">
-                            <div className="bg-background/40 p-8 rounded-sm text-center">
+                        <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-8 shadow-2xl shadow-black/10 dark:shadow-black/40">
+                            <div className="text-center">
                                 <div className="relative inline-block mb-6">
                                     <div className="w-24 h-24 rounded-full bg-gold/10 border-2 border-gold/30 flex items-center justify-center overflow-hidden">
                                         {user?.image ? (
@@ -66,7 +66,6 @@ export default function ProfilePage() {
                                 </div>
                                 <h1 className="text-2xl font-serif font-light text-foreground">{user?.firstName} {user?.lastName}</h1>
                                 <p className="text-[10px] font-mono text-gold tracking-widest uppercase mt-2 opacity-60">Operative ID: {user?.id.slice(0, 12)}</p>
-                            </div>
                         </div>
 
                         <Button 
@@ -87,14 +86,14 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="glass-pane p-8 bg-background/20 space-y-4">
+                                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-8 space-y-4">
                                     <div className="flex items-center gap-3 text-gold/40">
                                         <Mail className="h-4 w-4" />
                                         <span className="font-mono text-[9px] tracking-widest uppercase font-bold">Encrypted Email</span>
                                     </div>
                                     <p className="text-lg font-serif">{user?.email}</p>
                                 </div>
-                                <div className="glass-pane p-8 bg-background/20 space-y-4">
+                                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-8 space-y-4">
                                     <div className="flex items-center gap-3 text-gold/40">
                                         <Award className="h-4 w-4" />
                                         <span className="font-mono text-[9px] tracking-widest uppercase font-bold">Clearance Level</span>
@@ -105,7 +104,7 @@ export default function ProfilePage() {
                         </section>
 
                         <section className="pt-8 border-t border-white/5">
-                            <h3 className="font-mono text-[10px] tracking-[0.3em] text-white/20 uppercase mb-8">Performance Metrics</h3>
+                            <h3 className="font-mono text-[10px] tracking-[0.3em] text-muted-foreground/60 uppercase mb-8">Performance Metrics</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                 <MetricCard icon={<FileText />} label="Audits" value="12" />
                                 <MetricCard icon={<Shield />} label="Precision" value="99.4%" />
@@ -121,7 +120,7 @@ export default function ProfilePage() {
 
 function MetricCard({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) {
     return (
-        <div className="p-6 bg-card/5 border border-white/5 rounded-sm hover:border-gold/20 transition-all group">
+        <div className="p-6 bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm hover:border-gold/30 transition-all group shadow-sm">
             <div className="text-gold/20 group-hover:text-gold/40 transition-colors mb-4">{icon}</div>
             <div className="text-2xl font-serif text-foreground mb-1">{value}</div>
             <div className="font-mono text-[8px] tracking-widest uppercase text-muted-foreground/40">{label}</div>

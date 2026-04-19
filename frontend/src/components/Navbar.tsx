@@ -21,7 +21,7 @@ export default function Navbar() {
     ];
 
     return (
-        <nav className="hidden md:flex fixed top-0 left-0 right-0 z-[100] h-[68px] items-center justify-between px-6 sm:px-10 bg-white/40 dark:bg-midnight/80 backdrop-blur-[24px] border-b border-black/5 dark:border-white/5 shadow-xl shadow-black/5 dark:shadow-black/50">
+        <nav className="hidden md:flex fixed top-0 left-0 right-0 z-[100] h-[68px] items-center justify-between px-6 sm:px-10 bg-background/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
             <div className="flex items-center gap-10">
                 <Link href="/" className="flex items-center gap-6 pr-6 group border-r border-black/5 dark:border-white/5 h-[68px] font-serif text-xl font-light tracking-tight text-foreground">
                     Barrister AI

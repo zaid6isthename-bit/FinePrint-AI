@@ -74,7 +74,7 @@ export default function SignupPage() {
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-0 md:p-6 relative overflow-hidden bg-transparent grow">
+        <main className="min-h-screen flex items-center justify-center p-0 md:p-6 relative overflow-hidden bg-background grow">
             {/* Mobile UI */}
             <div className="md:hidden w-full">
                 <MobileAuth 
@@ -105,8 +105,7 @@ export default function SignupPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="hidden md:block w-full max-w-md z-10"
             >
-                <div className="glass-pane p-1 shadow-2xl shadow-black/50">
-                    <div className="bg-background/40 p-8 sm:p-10 rounded-sm">
+                <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-8 sm:p-10 shadow-2xl shadow-black/10 dark:shadow-black/40">
                         <div className="text-center mb-10">
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-[4px] bg-gold/10 border border-gold/20 mb-6">
                                 <UserPlus className="h-6 w-6 text-gold" />
@@ -123,7 +122,7 @@ export default function SignupPage() {
                                         id="firstName"
                                         value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
-                                        className="h-12 bg-background/30 border-black/5 dark:border-white/5 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
+                                        className="h-12 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
                                     />
                                 </div>
                                 <div className="space-y-3">
@@ -132,7 +131,7 @@ export default function SignupPage() {
                                         id="lastName"
                                         value={lastName}
                                         onChange={(e) => setLastName(e.target.value)}
-                                        className="h-12 bg-background/30 border-black/5 dark:border-white/5 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
+                                        className="h-12 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 font-mono text-xs px-4"
                                     />
                                 </div>
                             </div>
@@ -147,7 +146,7 @@ export default function SignupPage() {
                                         placeholder="legal@corporate.ai"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="pl-12 h-12 bg-background/30 border-black/5 dark:border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        className="pl-12 h-12 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/40 font-mono text-xs"
                                         required
                                     />
                                 </div>
@@ -163,7 +162,7 @@ export default function SignupPage() {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="pl-12 h-12 bg-background/30 border-black/5 dark:border-white/5 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/20 font-mono text-xs"
+                                        className="pl-12 h-12 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/40 font-mono text-xs"
                                         required
                                     />
                                 </div>
@@ -197,7 +196,6 @@ export default function SignupPage() {
                             </p>
                         </div>
                     </div>
-                </div>
             </motion.div>
         </main>
     );

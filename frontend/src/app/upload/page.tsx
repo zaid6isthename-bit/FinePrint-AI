@@ -150,8 +150,7 @@ export default function UploadPage() {
                                 </p>
                             </div>
 
-                            <div className="glass-pane p-1 shadow-2xl shadow-black/40">
-                                <div className="bg-background/40 p-10 rounded-[4px] space-y-10">
+                            <div className="bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-sm p-10 shadow-2xl shadow-black/10 dark:shadow-black/40 space-y-10">
                                     <div className="space-y-4">
                                         <Label htmlFor="title" className="font-mono text-[9px] tracking-[0.25em] text-muted-foreground/60 uppercase ml-1">Archive Identifer</Label>
                                         <Input
@@ -159,7 +158,7 @@ export default function UploadPage() {
                                             placeholder="e.g., MSA_PRIME_2024"
                                             value={title}
                                             onChange={(e) => setTitle(e.target.value)}
-                                            className="bg-background/30 border-black/5 dark:border-white/5 h-14 text-sm rounded-sm focus:ring-gold focus:border-gold/50 transition-all font-mono px-6 text-foreground placeholder:text-muted-foreground/20"
+                                            className="bg-transparent border border-black/10 dark:border-white/10 h-14 text-sm rounded-sm focus:ring-gold focus:border-gold/50 transition-all font-mono px-6 text-foreground placeholder:text-muted-foreground/40"
                                         />
                                     </div>
 
@@ -246,7 +245,6 @@ export default function UploadPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                             </div>
                         </motion.div>
                     </div>

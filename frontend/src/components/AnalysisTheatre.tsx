@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useMemo } from "react";
 import { ShieldAlert, Scale, Zap, Info, AlertTriangle } from "lucide-react";
+import FluidGlass from "./FluidGlass";
 
 const PHRASES = [
     "Mapping contractual obligations...",
@@ -133,83 +134,9 @@ export function AnalysisTheatre() {
                 </svg>
             </div>
 
-            {/* Document Layers (Scanning Theatre) */}
-            <div className="relative z-10 perspective-[2000px]">
-                {[...Array(3)].map((_, i) => (
-                    <motion.div
-                        key={`layer-${i}`}
-                        initial={{ rotateX: 35, rotateZ: -25, y: 100, opacity: 0 }}
-                        animate={{
-                            y: -30 * i,
-                            opacity: 1 - i * 0.2,
-                            x: 20 * i,
-                            rotateX: 35,
-                            rotateZ: -25,
-                        }}
-                        transition={{ duration: 1, delay: i * 0.2, ease: [0.22, 1, 0.36, 1] }}
-                        exit={{
-                            rotateX: 0,
-                            rotateZ: 0,
-                            y: 0,
-                            x: 0,
-                            opacity: 0,
-                            scale: 0.9,
-                            transition: { duration: 0.8, ease: "circIn" }
-                        }}
-                        className="absolute inset-x-[-140px] inset-y-[-180px] w-[280px] h-[360px] glass-pane border-border dark:border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden"
-                    >
-                        {/* Vertical Scan Light Sweep - Legal Gold */}
-                        {i === 0 && (
-                            <motion.div
-                                className="absolute inset-x-0 h-2 bg-gradient-to-b from-transparent via-gold/50 to-transparent z-20"
-                                animate={{ top: ["-10%", "110%"] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            />
-                        )}
-
-                        {/* Clause Sections (Mock Content) */}
-                        <div className="p-8 space-y-4">
-                            {[...Array(10)].map((_, j) => (
-                                <motion.div
-                                    key={`line-${j}`}
-                                    animate={{
-                                        opacity: highlightedClause === j ? 1 : 0.1,
-                                        backgroundColor: highlightedClause === j ? "rgba(200, 169, 106, 0.15)" : "rgba(161, 161, 170, 0.05)",
-                                        scale: highlightedClause === j ? 1.02 : 1,
-                                    }}
-                                    transition={{ duration: 0.5 }}
-                                    className={`h-2.5 rounded-full relative overflow-hidden`}
-                                    style={{ width: `${60 + Math.sin(j) * 30}%` }}
-                                >
-                                    {/* Clause Glow Effect */}
-                                    <AnimatePresence>
-                                        {highlightedClause === j && (
-                                            <motion.div
-                                                initial={{ x: "-100%" }}
-                                                animate={{ x: "100%" }}
-                                                transition={{ duration: 1, ease: "linear" }}
-                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-gold/20 to-transparent"
-                                            />
-                                        )}
-                                    </AnimatePresence>
-                                </motion.div>
-                            ))}
-                        </div>
-
-                        {/* Ripple pulses on risk moments */}
-                        <AnimatePresence>
-                            {riskNote && (
-                                <motion.div
-                                    initial={{ scale: 0, opacity: 0.5 }}
-                                    animate={{ scale: 2, opacity: 0 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 1.5 }}
-                                    className="absolute inset-0 bg-red-500/10 rounded-full"
-                                />
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
-                ))}
+            {/* Document Layers (Scanning Theatre) replaced by FluidGlass */}
+            <div className="absolute inset-0 z-10 flex items-center justify-center">
+                <FluidGlass mode="lens" />
             </div>
 
             {/* Floating Tags & Risk Side Notes */}

@@ -55,7 +55,7 @@ export default function HistoryPage() {
     }
 
     return (
-        <main className="min-h-screen pt-[40px] md:pt-32 pb-24 px-0 md:px-6 lg:px-24 bg-transparent relative overflow-hidden">
+        <main className="min-h-screen pt-[40px] md:pt-32 pb-24 px-0 md:px-6 lg:px-24 bg-background relative overflow-hidden">
             {/* Mobile UI */}
             <div className="md:hidden">
                 <MobileHistory history={history} loading={loading} />
@@ -90,7 +90,7 @@ export default function HistoryPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05, ease: [0.22, 1, 0.36, 1], duration: 0.7 }}
                                 key={doc.id}
-                                className="group relative flex items-center justify-between p-8 rounded-sm glass-pane bg-black/[0.02] dark:bg-white/[0.02] border-black/5 dark:border-white/5 hover:border-gold/30 hover:bg-gold/[0.03] transition-all duration-700 overflow-hidden shadow-xl shadow-black/40"
+                                className="group relative flex items-center justify-between p-8 rounded-sm bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-gold/30 transition-all duration-700 overflow-hidden shadow-lg shadow-black/5"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-r from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
@@ -154,7 +154,7 @@ export default function HistoryPage() {
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="text-center py-40 rounded-sm glass-pane border-dashed border-black/10 dark:border-white/10"
+                            className="text-center py-40 rounded-sm bg-white dark:bg-white/5 border-dashed border-black/10 dark:border-white/10"
                         >
                             <AIPresence status="idle" className="mb-10 opacity-10 mx-auto" />
                             <p className="text-zinc-600 font-mono text-[10px] uppercase tracking-[0.4em] mb-12">The vault is currently empty</p>

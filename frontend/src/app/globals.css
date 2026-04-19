@@ -12,7 +12,7 @@
 
 @layer base {
   :root {
-    --background: 40 10% 98%; /* Slightly cooler, cleaner white */
+    --background: 40 25% 94%; /* Matches #F2EFE9 */
     --foreground: 220 20% 12%; /* Deep charcoal, almost midnight */
     --card: 0 0% 100%;
     --card-foreground: 220 20% 12%;
@@ -34,8 +34,8 @@
     --radius: 0.25rem;
 
     /* Adaptive Brand Tokens */
-    --midnight: #FBF9F6; /* Premium off-white/linen */
-    --midnight-rgb: 251, 249, 246;
+    --midnight: #F2EFE9; /* Matches updated background */
+    --midnight-rgb: 242, 239, 233;
     --gold: #A68A4F;
     --gold-rgb: 166, 138, 79;
     --text: #1A1B1E;
