@@ -1,20 +1,16 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ShieldAlert, Scale, Zap, Info, AlertTriangle } from "lucide-react";
-import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { MeshTransmissionMaterial } from "@react-three/drei";
-import { easing } from "maath";
 
 /* ---------------- CONFIG ---------------- */
 
 const PHRASES = [
-  "Mapping contractual obligations...",
-  "Evaluating liability exposure...",
-  "Detecting financial risk...",
-  "Assessing enforceability...",
+  "Parsing document structure...",
+  "Analyzing legal semantics...",
+  "Detecting risk patterns...",
+  "Cross-referencing clauses...",
 ];
 
 const TAGS = [
@@ -30,52 +26,12 @@ const RISK_NOTES = [
   "Late penalty risk",
 ];
 
-/* ---------------- GLASS LENS ---------------- */
-
-function GlassLens() {
-  const ref = useRef<any>();
-
-  useFrame((state, delta) => {
-    const t = state.clock.elapsedTime;
-
-    // Smooth AI-like motion
-    const x = Math.sin(t * 0.6) * 2.2;
-    const y = Math.cos(t * 0.4) * 1.5;
-
-    easing.damp3(ref.current.position, [x, y, 5], 0.15, delta);
-  });
-
-  return (
-    <mesh ref={ref}>
-      <sphereGeometry args={[1.2, 64, 64]} />
-      <MeshTransmissionMaterial
-        transmission={1}
-        roughness={0}
-        thickness={6}
-        ior={1.2}
-        chromaticAberration={0.08}
-        anisotropy={0.01}
-      />
-    </mesh>
-  );
-}
-
-function GlassCanvas() {
-  return (
-    <Canvas camera={{ position: [0, 0, 8], fov: 25 }}>
-      <ambientLight intensity={1} />
-      <GlassLens />
-    </Canvas>
-  );
-}
-
-/* ---------------- MAIN COMPONENT ---------------- */
+/* ---------------- MAIN ---------------- */
 
 export function AnalysisTheatre() {
   const [phraseIdx, setPhraseIdx] = useState(0);
   const [activeTag, setActiveTag] = useState<any>(null);
   const [riskNote, setRiskNote] = useState<string | null>(null);
-  const [pulseLines, setPulseLines] = useState(false);
 
   useEffect(() => {
     const phraseInterval = setInterval(() => {
@@ -95,65 +51,110 @@ export function AnalysisTheatre() {
       }
     }, 6000);
 
-    const pulseInterval = setInterval(() => {
-      setPulseLines(true);
-      setTimeout(() => setPulseLines(false), 800);
-    }, 3000);
-
     return () => {
       clearInterval(phraseInterval);
       clearInterval(tagInterval);
       clearInterval(riskInterval);
-      clearInterval(pulseInterval);
     };
   }, []);
 
-  const neuralConnections = useMemo(() => [
-    { d: "M 100 100 L 220 300", delay: 0 },
-    { d: "M 220 300 L 340 100", delay: 0.5 },
-    { d: "M 340 100 L 460 300", delay: 1 },
-    { d: "M 460 300 L 580 100", delay: 1.5 },
-    { d: "M 580 100 L 700 300", delay: 2 },
-  ], []);
+  /* ---------------- PARTICLES ---------------- */
+
+  const particles = useMemo(() => {
+    return Array.from({ length: 12 }).map((_, i) => ({
+      id: i,
+      angle: (i / 12) * Math.PI * 2,
+      radius: 80 + Math.random() * 40,
+      speed: 0.5 + Math.random(),
+    }));
+  }, []);
 
   return (
     <div className="relative w-full max-w-4xl mx-auto h-[600px] flex items-center justify-center overflow-hidden">
 
-      {/* DOCUMENT BACKGROUND (IMPORTANT) */}
-      <div className="absolute inset-0 z-10 flex items-center justify-center">
-        <div className="w-[70%] h-[80%] bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-xs text-white/40 space-y-2">
-          <p>Clause 1: Termination conditions and obligations...</p>
-          <p>Clause 2: Indemnity responsibilities...</p>
-          <p>Clause 3: Payment timelines and penalties...</p>
-          <p>Clause 4: Arbitration and dispute resolution...</p>
-        </div>
-      </div>
+      {/* CORE ANIMATION */}
+      <div className="relative flex items-center justify-center">
 
-      {/* GLASS LENS */}
-      <div className="absolute inset-0 z-20">
-        <GlassCanvas />
-      </div>
+        {/* PULSING CORE */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400/40 to-yellow-200/10 blur-xl absolute"
+        />
 
-      {/* NEURAL LINES */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <svg width="100%" height="100%" viewBox="0 0 800 600">
-          {neuralConnections.map((conn, i) => (
-            <motion.path
-              key={i}
-              d={conn.d}
-              stroke="gold"
-              strokeWidth="1.5"
-              fill="none"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 2.5, delay: conn.delay }}
+        <motion.div
+          animate={{ scale: [1, 1.1, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          className="w-6 h-6 rounded-full bg-yellow-300 shadow-[0_0_25px_rgba(255,215,0,0.6)]"
+        />
+
+        {/* ROTATING RINGS */}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="absolute w-48 h-48 border border-yellow-400/20 rounded-full"
+        />
+
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+          className="absolute w-64 h-64 border border-yellow-400/10 rounded-full"
+        />
+
+        {/* ORBITING PARTICLES */}
+        {particles.map((p) => (
+          <motion.div
+            key={p.id}
+            animate={{
+              rotate: 360,
+            }}
+            transition={{
+              duration: 20 / p.speed,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            style={{
+              position: "absolute",
+              width: p.radius * 2,
+              height: p.radius * 2,
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "0%",
+                transform: "translate(-50%, -50%)",
+              }}
+              className="w-2 h-2 rounded-full bg-yellow-300 shadow-[0_0_10px_rgba(255,215,0,0.8)]"
             />
-          ))}
-        </svg>
+          </motion.div>
+        ))}
+
+        {/* ENERGY LINES */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              opacity: [0.1, 0.6, 0.1],
+              scaleX: [0.8, 1.2, 0.8],
+            }}
+            transition={{
+              duration: 2,
+              delay: i * 0.3,
+              repeat: Infinity,
+            }}
+            className="absolute w-32 h-[1px] bg-gradient-to-r from-transparent via-yellow-400 to-transparent"
+            style={{
+              transform: `rotate(${i * 30}deg)`,
+            }}
+          />
+        ))}
+
       </div>
 
       {/* TAGS + RISK */}
-      <div className="absolute inset-0 z-30 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none">
         <AnimatePresence>
           {activeTag && (
             <motion.div
@@ -161,7 +162,7 @@ export function AnalysisTheatre() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className={`absolute left-1/2 top-1/2 px-4 py-2 rounded-xl border ${activeTag.borderColor} ${activeTag.bgColor}`}
+              className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 rounded-xl border ${activeTag.borderColor} ${activeTag.bgColor}`}
             >
               <span className={`text-xs ${activeTag.color}`}>{activeTag.text}</span>
             </motion.div>
@@ -173,7 +174,7 @@ export function AnalysisTheatre() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute left-1/2 top-1/2 mt-16 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20"
+              className="absolute left-1/2 top-1/2 mt-16 -translate-x-1/2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-500/20"
             >
               <span className="text-xs text-red-400">{riskNote}</span>
             </motion.div>
@@ -194,6 +195,14 @@ export function AnalysisTheatre() {
             {PHRASES[phraseIdx]}
           </motion.p>
         </AnimatePresence>
+
+        <motion.div
+          animate={{ opacity: [0.3, 0.7, 0.3] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="mt-3 text-[10px] tracking-[0.3em] text-zinc-500 uppercase"
+        >
+          Cognitive Processing • Risk Engine Active
+        </motion.div>
       </div>
 
     </div>
