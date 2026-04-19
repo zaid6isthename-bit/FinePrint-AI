@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState, useMemo } from "react";
 import { ShieldAlert, Scale, Zap, Info, AlertTriangle } from "lucide-react";
-import FluidGlass from "./FluidGlass";
 
 const PHRASES = [
   "Mapping contractual obligations...",
@@ -129,12 +128,7 @@ export function AnalysisTheatre() {
         </svg>
       </div>
 
-      {/* 2. Scanning Lens (FluidGlass) */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        <FluidGlass />
-      </div>
-
-      {/* 3. Floating Comments & Tags */}
+      {/* 2. Floating Comments & Tags */}
       <div className="absolute inset-0 pointer-events-none z-30">
         <AnimatePresence>
           {activeTag && (
