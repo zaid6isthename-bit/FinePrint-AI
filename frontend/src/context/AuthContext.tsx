@@ -9,6 +9,7 @@ interface User {
     firstName?: string;
     lastName?: string;
     image?: string | null;
+    clearanceLevel?: string;
 }
 
 interface AuthContextType {
@@ -36,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 firstName: session.user.firstName,
                 lastName: session.user.lastName,
                 image: session.user.image,
+                clearanceLevel: (session.user as any).clearanceLevel,
             });
         } else if (status === "unauthenticated") {
             setUser(null);

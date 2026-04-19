@@ -58,7 +58,7 @@ export default function Navbar() {
                                 <User className="h-3 w-3 text-gold" />
                             )}
                             <span className="text-[10px] font-mono tracking-wider text-muted-foreground max-w-[100px] truncate">
-                                {user.email}
+                                {user.firstName || user.email}
                             </span>
                         </div>
                         <ModeToggle />

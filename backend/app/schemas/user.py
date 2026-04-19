@@ -16,6 +16,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     firstName: Optional[str] = None
     lastName: Optional[str] = None
+    clearanceLevel: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -14,6 +14,7 @@ declare module "next-auth" {
       lastName?: string;
       image?: string | null;
       name?: string;
+      clearanceLevel?: string;
     };
     accessToken?: string;
   }
@@ -25,6 +26,7 @@ declare module "next-auth" {
     lastName?: string;
     image?: string | null;
     accessToken?: string;
+    clearanceLevel?: string;
   }
 }
 
@@ -36,6 +38,7 @@ declare module "next-auth/jwt" {
     lastName?: string;
     picture?: string | null;
     accessToken?: string;
+    clearanceLevel?: string;
   }
 }
 
@@ -81,6 +84,7 @@ const providers: NextAuthOptions["providers"] = [
           firstName: user.firstName ?? undefined,
           lastName: user.lastName ?? undefined,
           accessToken: data.access_token,
+          clearanceLevel: user.clearanceLevel,
         };
       } catch (error) {
         console.error("Auth provider error:", error);
@@ -127,6 +131,7 @@ export const authOptions: NextAuthOptions = {
         token.lastName = user.lastName;
         token.picture = user.image;
         token.accessToken = user.accessToken;
+        token.clearanceLevel = user.clearanceLevel;
       }
 
       return token;
@@ -142,6 +147,7 @@ export const authOptions: NextAuthOptions = {
         session.user.name = [token.firstName, token.lastName]
           .filter(Boolean)
           .join(" ") || token.email || "";
+        (session.user as any).clearanceLevel = token.clearanceLevel;
       }
       session.accessToken = token.accessToken;
 

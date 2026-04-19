@@ -99,7 +99,7 @@ export default function ProfilePage() {
                                         <Award className="h-4 w-4" />
                                         <span className="font-mono text-[9px] tracking-widest uppercase font-bold">Clearance Level</span>
                                     </div>
-                                    <p className="text-lg font-serif">Level 4 // Auditor</p>
+                                    <p className="text-lg font-serif">{user?.clearanceLevel || "Level 1 // Operative"}</p>
                                 </div>
                             </div>
                         </section>

@@ -72,6 +72,26 @@ class AuthService:
                 data={"sub": user.id}, expires_delta=access_token_expires
             )
 
+            # Calculate Dynamic Clearance Level based on document count
+            doc_count = await db.document.count(where={"userId": user.id})
+            
+            # Simple level logic
+            new_level = "Level 1 // Operative"
+            if doc_count > 10:
+                new_level = "Level 4 // Master Auditor"
+            elif doc_count > 5:
+                new_level = "Level 3 // Senior Analyst"
+            elif doc_count > 2:
+                new_level = "Level 2 // Special Agent"
+                
+            # If level has changed, update it in DB
+            if user.clearanceLevel != new_level:
+                user = await db.user.update(
+                    where={"id": user.id},
+                    data={"clearanceLevel": new_level}
+                )
+                logger.info(f"User {user.email} promoted to {new_level}")
+
             logger.info(f"User authenticated successfully: {user.email}")
             
             return {
