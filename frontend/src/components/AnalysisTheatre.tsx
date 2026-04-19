@@ -135,7 +135,7 @@ export function AnalysisTheatre() {
             </div>
 
             {/* Document Layers (Scanning Theatre) replaced by FluidGlass */}
-            <div className="absolute inset-0 z-10 flex items-center justify-center">
+            <div className="absolute inset-0 z-20 pointer-events-none">
                 <FluidGlass mode="lens" />
             </div>
 

@@ -1,150 +1,86 @@
 "use client";
-/* eslint-disable react/no-unknown-property */
+
 import * as THREE from 'three';
-import { useRef, useState, useEffect, memo } from 'react';
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber';
+import { useRef, useState, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import {
-  useFBO,
-  Environment,
   MeshTransmissionMaterial,
-  Text
+  Text,
+  Environment,
+  Float
 } from '@react-three/drei';
 import { easing } from 'maath';
 
-export default function FluidGlass({ mode = 'lens', lensProps = {} }) {
-  // We use a simplified ModeWrapper that renders a "Glass Bob" (Lens effect)
-  const modeProps = {
-      scale: 1.5,
-      ior: 1.15,
-      thickness: 10,
-      chromaticAberration: 0.05,
-      anisotropy: 0.01,
-      roughness: 0,
-      transmission: 1,
-      ...lensProps
-  };
-
+export default function FluidGlass({ lensProps = {} }: any) {
   return (
-    <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
-        <ambientLight intensity={1.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2} />
-        <Environment preset="studio" />
-        <BobWrapper modeProps={modeProps}>
-            <DocumentPreview />
-        </BobWrapper>
-    </Canvas>
+    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}>
+      <Canvas 
+        camera={{ position: [0, 0, 20], fov: 35 }} 
+        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 2]}
+      >
+        <ambientLight intensity={1} />
+        <pointLight position={[10, 10, 10]} intensity={2} color="#D9A441" />
+        <Environment preset="city" />
+        
+        <group>
+          {/* Document Sheet - Simplified */}
+          <mesh position={[0, 0, -5]}>
+            <planeGeometry args={[14, 18]} />
+            <meshBasicMaterial color="#ffffff" opacity={0.08} transparent />
+          </mesh>
+          
+          <Text
+            position={[0, 5.5, -4.9]}
+            fontSize={0.5}
+            color="#D9A441"
+            font="https://fonts.gstatic.com/s/robotomono/v22/L0xuDF4xlVMF-BfR8bXMIhJHg45bgewp.woff"
+          >
+            CONFIDENTIAL ARCHIVE ANALYSIS
+          </Text>
+
+          {/* Lens */}
+          <MovingLens lensProps={lensProps} />
+        </group>
+      </Canvas>
+    </div>
   );
 }
 
-const BobWrapper = memo(function BobWrapper({
-  children,
-  modeProps = {}
-}: any) {
-  const ref = useRef<any>();
-  const buffer = useFBO();
-  const { viewport: vp } = useThree();
-  const [scene] = useState(() => new THREE.Scene());
-  
-  // Autonomous AI Eye logic state
-  const targetPos = useRef(new THREE.Vector2(0, 0));
-  const pauseUntil = useRef(0);
+function MovingLens({ lensProps }: any) {
+  const meshRef = useRef<THREE.Mesh>(null!);
+  const [target] = useState(() => new THREE.Vector3(0, 0, 2));
+  const [nextMove, setNextMove] = useState(0);
 
   useFrame((state, delta) => {
-    const { gl, camera } = state;
     const t = state.clock.getElapsedTime();
-
-    // Autonomous scanning mechanism
-    if (t > pauseUntil.current) {
-        // Pick a new target coordinate
-        targetPos.current.set(
-            (Math.random() - 0.5) * 4.5, // X bounds
-            (Math.random() - 0.5) * 6.5  // Y bounds
-        );
-        // Pause briefly upon arrival before moving next (simulating reading)
-        pauseUntil.current = t + 1.5 + Math.random() * 2.5; 
+    if (t > nextMove) {
+      target.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10, 2);
+      setNextMove(t + 1 + Math.random() * 2);
     }
-
-    if (ref.current) {
-        // AI scanning fluid easing
-        easing.damp3(ref.current.position, [targetPos.current.x, targetPos.current.y, 1], 0.4, delta);
-        // Subtly rotate to simulate organic eye-tracking micro-movements
-        easing.dampE(
-            ref.current.rotation, 
-            [
-                (targetPos.current.y * 0.1), 
-                (-targetPos.current.x * 0.1), 
-                0
-            ], 
-            0.5, 
-            delta
-        );
+    if (meshRef.current) {
+      easing.damp3(meshRef.current.position, target, 0.4, delta);
+      easing.dampE(meshRef.current.rotation, [target.y * 0.1, -target.x * 0.1, 0], 0.5, delta);
     }
-
-    gl.setRenderTarget(buffer);
-    gl.render(scene, camera);
-    gl.setRenderTarget(null);
   });
 
-  const { scale, ior, thickness, anisotropy, chromaticAberration, ...extraMat } = modeProps as any;
-
   return (
-    <>
-      {createPortal(children, scene)}
-      <mesh scale={[vp.width, vp.height, 1]}>
-        <planeGeometry />
-        <meshBasicMaterial map={buffer.texture} transparent />
-      </mesh>
-      <mesh ref={ref} scale={scale ?? 1.5}>
-        {/* We use a flattened Sphere to tightly represent a magnifying lens */}
+    <Float speed={3} rotationIntensity={0.5} floatIntensity={0.5}>
+      <mesh ref={meshRef} scale={2.8}>
         <sphereGeometry args={[1, 64, 64]} />
-        <MeshTransmissionMaterial
-          buffer={buffer.texture}
-          ior={ior ?? 1.15}
-          thickness={thickness ?? 10}
-          anisotropy={anisotropy ?? 0.01}
-          chromaticAberration={chromaticAberration ?? 0.05}
-          roughness={extraMat.roughness ?? 0}
-          transmission={extraMat.transmission ?? 1}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-          {...extraMat}
+        <MeshTransmissionMaterial 
+          thickness={10}
+          ior={1.12}
+          chromaticAberration={0.05}
+          anisotropy={0.1}
+          color="white"
+          transmission={1}
+          roughness={0}
+          distortion={0.2}
+          distortionScale={0.3}
+          {...lensProps} 
         />
       </mesh>
-    </>
-  );
-});
-
-function DocumentPreview() {
-  const { viewport } = useThree();
-  
-  return (
-    <group position={[0,0,-8]}>
-        {/* Mock Document Backdrop */}
-        <mesh position={[0, 0, -0.1]}>
-            <planeGeometry args={[10, 14]} />
-            <meshBasicMaterial color="#ffffff" />
-        </mesh>
-        
-        {/* Glowing Header */}
-        <Text
-          position={[0, 5, 0.02]}
-          fontSize={0.8}
-          color="#1e293b"
-          anchorX="center"
-          anchorY="middle"
-          font="https://fonts.gstatic.com/s/robotomono/v22/L0xuDF4xlVMF-BfR8bXMIhJHg45bgewp.woff"
-        >
-          ANALYSIS_UPLINK
-        </Text>
-
-        {/* Document Formatting Lines */}
-        {[...Array(15)].map((_, i) => (
-            <mesh key={i} position={[-(Math.random() * 2), 3 - i * 0.7, 0.01]}>
-                <planeGeometry args={[Math.random() * 4 + 3, 0.2]} />
-                {/* Randomly inject some "found risk" colors mimicking analysis */}
-                <meshBasicMaterial color={i === 4 || i === 9 ? "#D9A441" : (i === 12 ? "#B85C5C" : "#cbd5e1")} />
-            </mesh>
-        ))}
-    </group>
+    </Float>
   );
 }
