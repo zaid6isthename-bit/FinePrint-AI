@@ -21,6 +21,7 @@ interface Clause {
 interface DocumentData {
     id: string;
     title: string;
+    filename?: string;
     riskScore: number | null;
     status: string;
     clauses: Clause[];
@@ -31,11 +32,12 @@ interface DocumentData {
 
 interface MobileDashboardProps {
     data: DocumentData;
+    negotiationMessage: string;
     onExport: () => void;
     onCopyNegotiation: () => void;
 }
 
-export default function MobileDashboard({ data, onExport, onCopyNegotiation }: MobileDashboardProps) {
+export default function MobileDashboard({ data, negotiationMessage, onExport, onCopyNegotiation }: MobileDashboardProps) {
     const [selectedClause, setSelectedClause] = useState<Clause | null>(
         data.clauses.length > 0 ? data.clauses[0] : null
     );
@@ -170,7 +172,7 @@ export default function MobileDashboard({ data, onExport, onCopyNegotiation }: M
                         </button>
                     </div>
                     <p className="text-xs text-muted-foreground/60 font-serif italic leading-relaxed line-clamp-4">
-                        {data.negotiationMsg || "Generating tactical response..."}
+                        {negotiationMessage || "Generating tactical response..."}
                     </p>
                     <Button 
                         onClick={onCopyNegotiation}

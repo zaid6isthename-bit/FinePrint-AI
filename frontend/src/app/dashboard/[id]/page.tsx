@@ -28,6 +28,7 @@ interface Clause {
 interface DocumentData {
     id: string;
     title: string;
+    filename?: string;
     riskScore: number | null;
     status: string;
     clauses: Clause[];
@@ -35,6 +36,124 @@ interface DocumentData {
     userName?: string | null;
     clientName?: string | null;
     errorMessage?: string | null;
+}
+
+const GENERIC_PARTY_TOKENS = new Set([
+    "agreement",
+    "amendment",
+    "contract",
+    "customer",
+    "document",
+    "for",
+    "master",
+    "msa",
+    "nda",
+    "proposal",
+    "service",
+    "services",
+    "statement",
+    "sow",
+    "terms",
+    "with",
+]);
+
+function normalizeCandidate(value: string) {
+    return value
+        .replace(/\.pdf$/i, "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function inferClientName(title?: string | null, filename?: string | null, negotiationMsg?: string | null) {
+    const greetingMatch = negotiationMsg?.match(/^Dear\s+(.+?),/m);
+    if (greetingMatch?.[1]) {
+        return greetingMatch[1].trim();
+    }
+
+    const source = normalizeCandidate(title || filename || "");
+    if (!source) {
+        return null;
+    }
+
+    const splitParts = source
+        .split(/\b(?:between|with|for|and|vs|versus)\b|[|]/i)
+        .map((part) => normalizeCandidate(part))
+        .filter(Boolean);
+
+    for (const part of splitParts) {
+        const meaningfulWords = part
+            .split(/\s+/)
+            .filter((word) => !GENERIC_PARTY_TOKENS.has(word.toLowerCase()));
+        if (meaningfulWords.length > 0) {
+            return meaningfulWords.join(" ");
+        }
+    }
+
+    const fallback = source
+        .split(/\s+/)
+        .filter((word) => !GENERIC_PARTY_TOKENS.has(word.toLowerCase()))
+        .slice(0, 4)
+        .join(" ");
+
+    return fallback || null;
+}
+
+function buildResolvedNegotiationMessage(input: {
+    storedMessage?: string | null;
+    title: string;
+    userName: string;
+    clientName: string | null;
+    clauses: Clause[];
+}) {
+    const topPoints = [...input.clauses]
+        .sort((a, b) => b.severityScore - a.severityScore)
+        .slice(0, 3)
+        .map((clause) => `- ${clause.clauseType}: ${clause.simplifiedText || clause.originalText}`)
+        .join("\n");
+
+    const greeting = input.clientName ? `Dear ${input.clientName},` : "Dear Counterparty,";
+    const signoff = input.userName;
+
+    if (!input.storedMessage?.trim()) {
+        return [
+            greeting,
+            "",
+            `I reviewed ${input.title} and would like to discuss a few provisions before signing on behalf of ${signoff}:`,
+            "",
+            topPoints,
+            "",
+            "Could we narrow these terms or add clearer limits so the agreement is more balanced?",
+            "",
+            "Regards,",
+            signoff,
+        ].join("\n");
+    }
+
+    let message = input.storedMessage.trim();
+
+    if (/^(hello|hi there|dear\s+)/i.test(message)) {
+        message = message.replace(/^(hello|hi there|dear\s+.+?,)/i, greeting);
+    } else {
+        message = `${greeting}\n\n${message}`;
+    }
+
+    if (/(\n|^)sincerely,\s*\n/i.test(message)) {
+        message = message.replace(/((\n|^)sincerely,\s*\n)(.+)$/i, `$1${signoff}`);
+    } else if (/(\n|^)regards,\s*\n/i.test(message)) {
+        message = message.replace(/((\n|^)regards,\s*\n)(.+)$/i, `$1${signoff}`);
+    } else if (!message.includes(signoff)) {
+        message = `${message}\n\nRegards,\n${signoff}`;
+    }
+
+    if (!new RegExp(signoff.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(message)) {
+        message = message.replace(
+            /before signing/i,
+            `before signing on behalf of ${signoff}`
+        );
+    }
+
+    return message;
 }
 
 export default function Dashboard() {
@@ -98,8 +217,8 @@ export default function Dashboard() {
     }, [id, user, authLoading, router, fetchData, retryCount]);
 
     const copyNegotiation = () => {
-        if (data?.negotiationMsg) {
-            navigator.clipboard.writeText(data.negotiationMsg);
+        if (resolvedNegotiationMsg) {
+            navigator.clipboard.writeText(resolvedNegotiationMsg);
             toast({
                 title: "Protocol Copied",
                 description: "Strategy draft is ready for secure deployment."
@@ -171,7 +290,14 @@ export default function Dashboard() {
     if (!data) return null;
 
     const reportUserName = data.userName || signedInUserName;
-    const reportClientName = data.clientName || "Counterparty not confidently detected";
+    const reportClientName = data.clientName || inferClientName(data.title, data.filename, data.negotiationMsg);
+    const resolvedNegotiationMsg = buildResolvedNegotiationMessage({
+        storedMessage: data.negotiationMsg,
+        title: data.title,
+        userName: reportUserName,
+        clientName: reportClientName,
+        clauses: data.clauses,
+    });
 
     return (
         <main className="min-h-screen pt-[40px] md:pt-28 pb-12 px-0 md:px-6 lg:px-12 bg-background relative overflow-hidden">
@@ -179,6 +305,7 @@ export default function Dashboard() {
             <div className="md:hidden no-print">
                 <MobileDashboard 
                     data={data} 
+                    negotiationMessage={resolvedNegotiationMsg}
                     onExport={handleExport}
                     onCopyNegotiation={copyNegotiation}
                 />
@@ -397,7 +524,7 @@ export default function Dashboard() {
                             </div>
                             <div className="bg-muted/50 p-1 rounded-sm border border-black/10 dark:border-white/5">
                                 <pre className="whitespace-pre-wrap font-serif text-muted-foreground p-10 text-lg leading-relaxed max-h-60 overflow-y-auto custom-scrollbar italic tracking-wide">
-                                    {data.negotiationMsg || "STRATEGY OPTIMIZATION IN PROGRESS..."}
+                                    {resolvedNegotiationMsg || "STRATEGY OPTIMIZATION IN PROGRESS..."}
                                 </pre>
                             </div>
                         </motion.div>
@@ -434,7 +561,7 @@ export default function Dashboard() {
                         </div>
                         <div className="pr-party-card">
                             <div className="pr-field-label">Detected Client / Counterparty</div>
-                            <div className="pr-party-name">{reportClientName}</div>
+                            <div className="pr-party-name">{reportClientName || "Counterparty pending detection"}</div>
                         </div>
                     </div>
                     <div className="pr-risk-overview">
@@ -525,7 +652,7 @@ export default function Dashboard() {
                     <div className="pr-section pr-atomic">
                         <h2 className="pr-section-title">NEGOTIATION STRATEGY &amp; RECOMMENDED ACTIONS</h2>
                         <div className="pr-negotiation">
-                            <pre className="pr-negotiation-text">{data.negotiationMsg}</pre>
+                            <pre className="pr-negotiation-text">{resolvedNegotiationMsg}</pre>
                         </div>
                     </div>
                 )}
