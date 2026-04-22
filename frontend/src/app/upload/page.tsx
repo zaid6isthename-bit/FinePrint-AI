@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, FileIcon, Loader2, Sparkles, Lock, ShieldCheck, Zap } from "lucide-react";
+import { Upload, FileIcon, Loader2, Sparkles, Lock, Zap } from "lucide-react";
 import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
@@ -63,13 +63,12 @@ export default function UploadPage() {
 
             const response = await api.post(`/documents/upload?title=${encodeURIComponent(title)}`, formData);
 
-            // Optimized transitions for the refined 3D engine
             setTimeout(() => {
                 setStep("completed");
                 setTimeout(() => {
                     router.push(`/dashboard/${response.data.id}`);
-                }, 1500); // 1.5s show for speedometer
-            }, 2500); // 2.5s show for analysis theatre (optimized instant load)
+                }, 1200);
+            }, 3200);
 
         } catch (error: any) {
             setStep("upload");
@@ -352,8 +351,8 @@ export default function UploadPage() {
                                 <div key="theatre-box" className="w-full">
                                     <div className="max-w-4xl mx-auto">
                                         <div className="text-center mb-12">
-                                            <span className="font-mono text-[9px] tracking-[0.28em] text-gold uppercase mb-4 block">Neural Extraction</span>
-                                            <h2 className="text-3xl font-serif font-light text-foreground italic">Parsing Legal Structures...</h2>
+                                            <span className="font-mono text-[9px] tracking-[0.28em] text-gold uppercase mb-4 block">Live Contract Scan</span>
+                                            <h2 className="text-3xl font-serif font-light text-foreground italic">Mapping the agreement before the verdict appears...</h2>
                                         </div>
                                         <AnalysisTheatre />
                                     </div>
@@ -398,5 +397,4 @@ function RiskValue({ finalValue }: { finalValue: number }) {
         </span>
     );
 }
-
 

@@ -88,7 +88,40 @@ function extractLikelyPdfText(fileBytes: Uint8Array) {
   return sanitizeWhitespace(`${printable} ${literalStrings.join(" ")}`);
 }
 
+function extractNamedPartyFromStructuredText(text: string) {
+  const normalized = sanitizeWhitespace(text);
+  const patterns = [
+    /\b(?:client|customer|company|provider|vendor|supplier|contractor|consultant|licensor|licensee)\s*[:\-]\s*([A-Z][A-Za-z0-9&.,'()\/-]{2,100})/i,
+    /\b(?:this\s+agreement|this\s+contract)\s+(?:is\s+made\s+)?(?:by|between)\s+and\s+between\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})\s+and\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})/i,
+    /\bbetween\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})\s+and\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})/i,
+    /\bentered\s+into\s+(?:by|between)\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})\s+and\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})/i,
+    /\bmade\s+by\s+and\s+between\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})\s+and\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})/i,
+    /\b(?:for|on behalf of)\s+([A-Z][A-Za-z0-9&.,'()\/-]{2,100})/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = normalized.match(pattern);
+    if (!match) {
+      continue;
+    }
+
+    const candidates = match.slice(1).map((value) => normalizeCandidate(value || ""));
+    for (const candidate of candidates) {
+      if (candidate && looksLikeName(candidate)) {
+        return candidate;
+      }
+    }
+  }
+
+  return null;
+}
+
 function extractNamedPartyFromText(text: string) {
+  const structuredCandidate = extractNamedPartyFromStructuredText(text);
+  if (structuredCandidate) {
+    return structuredCandidate;
+  }
+
   const patterns = [
     /\b(?:client|customer|company|provider|vendor|supplier)\s*[:\-]\s*([A-Z][A-Za-z0-9&.,'() -]{2,80})/i,
     /\bbetween\s+[A-Z][A-Za-z0-9&.,'() -]{2,80}\s+and\s+([A-Z][A-Za-z0-9&.,'() -]{2,80})/i,
@@ -116,12 +149,14 @@ export function detectParties(input: {
   title: string;
   filename: string;
   fileBytes?: Uint8Array;
+  extractedText?: string | null;
   userName?: string | null;
 }) {
   const userName = toDisplayName(input.userName, "The reviewing party");
-  const textCandidate = input.fileBytes ? extractNamedPartyFromText(extractLikelyPdfText(input.fileBytes)) : null;
+  const extractedTextCandidate = input.extractedText ? extractNamedPartyFromText(input.extractedText) : null;
+  const rawPdfCandidate = input.fileBytes ? extractNamedPartyFromText(extractLikelyPdfText(input.fileBytes)) : null;
   const titleCandidate = pickTitleCandidate(input.title, input.filename);
-  const clientName = [textCandidate, titleCandidate].find(
+  const clientName = [extractedTextCandidate, rawPdfCandidate, titleCandidate].find(
     (candidate) =>
       candidate &&
       candidate.toLowerCase() !== userName.toLowerCase() &&

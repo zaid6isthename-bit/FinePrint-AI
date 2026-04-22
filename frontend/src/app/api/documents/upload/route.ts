@@ -4,6 +4,18 @@ import { authOptions } from "@/lib/auth";
 import { analyzeDocument } from "@/lib/server/analyzer";
 import { createCompletedDocument } from "@/lib/server/repository";
 import { detectParties } from "@/lib/server/partyDetection";
+import { PDFParse } from "pdf-parse";
+
+async function extractPdfText(fileBytes: Uint8Array) {
+    try {
+        const parser = new PDFParse({ data: fileBytes });
+        const result = await parser.getText();
+        await parser.destroy();
+        return result.text?.trim() || "";
+    } catch {
+        return "";
+    }
+}
 
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
@@ -28,11 +40,13 @@ export async function POST(request: Request) {
     }
 
     const fileBytes = new Uint8Array(await file.arrayBuffer());
+    const extractedText = await extractPdfText(fileBytes);
     const userName = [session.user.firstName, session.user.lastName].filter(Boolean).join(" ") || session.user.name || session.user.email;
     const parties = detectParties({
         title,
         filename: file.name,
         fileBytes,
+        extractedText,
         userName,
     });
     const analysis = analyzeDocument(title, file.name, parties);
