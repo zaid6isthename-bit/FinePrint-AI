@@ -31,6 +31,8 @@ type DocumentInput = {
   riskScore: number;
   negotiationMsg: string;
   userId: string;
+  userName: string;
+  clientName: string | null;
   clauses: ClauseInput[];
 };
 
@@ -141,6 +143,8 @@ export async function createCompletedDocument(input: DocumentInput) {
         negotiationMsg: input.negotiationMsg,
         errorMessage: null,
         userId: input.userId,
+        userName: input.userName,
+        clientName: input.clientName,
         clauses: {
           create: input.clauses.map((clause) => ({
             clauseType: clause.clauseType,
@@ -166,6 +170,8 @@ export async function createCompletedDocument(input: DocumentInput) {
     negotiationMsg: input.negotiationMsg,
     errorMessage: null,
     userId: input.userId,
+    userName: input.userName,
+    clientName: input.clientName,
     clauses: input.clauses,
   };
 

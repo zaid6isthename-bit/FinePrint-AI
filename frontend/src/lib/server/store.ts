@@ -32,6 +32,8 @@ export type StoredDocument = {
     negotiationMsg: string | null;
     errorMessage: string | null;
     userId: string;
+    userName: string | null;
+    clientName: string | null;
     clauses: StoredClause[];
 };
 

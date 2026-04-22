@@ -25,6 +25,8 @@ interface DocumentData {
     status: string;
     clauses: Clause[];
     negotiationMsg: string | null;
+    userName?: string | null;
+    clientName?: string | null;
 }
 
 interface MobileDashboardProps {

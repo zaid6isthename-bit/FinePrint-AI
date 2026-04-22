@@ -1,4 +1,5 @@
 import { createId, StoredClause } from "@/lib/server/store";
+import type { DetectedParties } from "@/lib/server/partyDetection";
 
 type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
@@ -87,21 +88,29 @@ const defaultClauses: ClauseTemplate[] = [
     },
 ];
 
-function buildNegotiationMessage(title: string, clauses: StoredClause[]) {
+function buildNegotiationMessage(title: string, clauses: StoredClause[], parties: DetectedParties) {
     const highest = [...clauses]
         .sort((a, b) => b.severityScore - a.severityScore)
         .slice(0, 3)
         .map((clause) => `- ${clause.clauseType}: ${clause.simplifiedText ?? clause.originalText}`)
         .join("\n");
 
+    const greeting = parties.clientName ? `Dear ${parties.clientName},` : "Dear Counterparty,";
+    const signature = parties.userName || "The reviewing party";
+
     return [
-        `Hello, I reviewed ${title} and would like to discuss a few provisions before signing:`,
+        greeting,
+        "",
+        `I reviewed ${title} and would like to discuss a few provisions before signing on behalf of ${signature}:`,
         highest,
         "Could we narrow these terms or add clearer limits so the agreement is more balanced?",
+        "",
+        `Regards,`,
+        signature,
     ].join("\n\n");
 }
 
-export function analyzeDocument(title: string, filename: string) {
+export function analyzeDocument(title: string, filename: string, parties: DetectedParties) {
     const haystack = `${title} ${filename}`.toLowerCase();
     const matched = ruleTemplates
         .filter((rule) => rule.keywords.some((keyword) => haystack.includes(keyword)))
@@ -125,6 +134,8 @@ export function analyzeDocument(title: string, filename: string) {
     return {
         clauses,
         riskScore,
-        negotiationMsg: buildNegotiationMessage(title, clauses),
+        negotiationMsg: buildNegotiationMessage(title, clauses, parties),
+        userName: parties.userName,
+        clientName: parties.clientName,
     };
 }

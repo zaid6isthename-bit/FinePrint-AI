@@ -32,6 +32,8 @@ model Document {
   clauses        Clause[]
   negotiationMsg String?
   errorMessage   String?
+  userName       String?
+  clientName     String?
 }
 
 model Clause {

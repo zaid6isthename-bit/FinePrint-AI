@@ -32,6 +32,8 @@ interface DocumentData {
     status: string;
     clauses: Clause[];
     negotiationMsg: string | null;
+    userName?: string | null;
+    clientName?: string | null;
     errorMessage?: string | null;
 }
 
@@ -47,6 +49,7 @@ export default function Dashboard() {
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
     const MAX_RETRIES = 3;
+    const signedInUserName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.email || "The reviewing party";
 
     const fetchData = useCallback(async () => {
         if (!id) return;
@@ -166,6 +169,9 @@ export default function Dashboard() {
     }
 
     if (!data) return null;
+
+    const reportUserName = data.userName || signedInUserName;
+    const reportClientName = data.clientName || "Counterparty not confidently detected";
 
     return (
         <main className="min-h-screen pt-[40px] md:pt-28 pb-12 px-0 md:px-6 lg:px-12 bg-background relative overflow-hidden">
@@ -421,6 +427,16 @@ export default function Dashboard() {
                 {/* Document Title & Risk Overview */}
                 <div className="pr-section">
                     <h1 className="pr-doc-title">{data.title}</h1>
+                    <div className="pr-party-grid">
+                        <div className="pr-party-card">
+                            <div className="pr-field-label">Reviewed By</div>
+                            <div className="pr-party-name">{reportUserName}</div>
+                        </div>
+                        <div className="pr-party-card">
+                            <div className="pr-field-label">Detected Client / Counterparty</div>
+                            <div className="pr-party-name">{reportClientName}</div>
+                        </div>
+                    </div>
                     <div className="pr-risk-overview">
                         <div className="pr-risk-score-block">
                             <div className="pr-risk-number" style={{ color: (data.riskScore || 0) > 60 ? '#dc2626' : '#b45309' }}>
@@ -541,6 +557,9 @@ export default function Dashboard() {
                     .pr-section { margin-bottom: 24px; }
                     .pr-atomic { page-break-inside: avoid; }
                     .pr-doc-title { font-size: 28px; font-weight: 300; letter-spacing: -0.02em; color: #111; margin: 0 0 20px 0; }
+                    .pr-party-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+                    .pr-party-card { border: 1px solid #e5d5c0; background: #faf7f3; padding: 10px 12px; }
+                    .pr-party-name { font-size: 13px; color: #111; line-height: 1.45; font-weight: 600; }
 
                     .pr-risk-overview { display: flex; gap: 32px; align-items: flex-start; }
                     .pr-risk-score-block { border: 2px solid #d4b896; padding: 16px 24px; text-align: center; min-width: 140px; }
@@ -582,4 +601,3 @@ export default function Dashboard() {
         </main>
     );
 }
-
