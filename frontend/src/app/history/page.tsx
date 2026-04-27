@@ -11,6 +11,7 @@ import { AIPresence } from "@/components/AIPresence";
 import MobileHistory from "@/components/MobileHistory";
 import api from "@/lib/api";
 import AnimatedList from "@/components/AnimatedList";
+import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 
 interface DocHistory {
     id: string;
@@ -74,6 +75,7 @@ export default function HistoryPage() {
 
     return (
         <main className="min-h-screen pt-[40px] md:pt-32 pb-24 px-0 md:px-6 lg:px-24 bg-background relative overflow-hidden">
+            <GlassFilter />
             {/* Mobile UI */}
             <div className="md:hidden">
                 <MobileHistory history={history} loading={loading} onDelete={handleDelete} />
@@ -107,7 +109,7 @@ export default function HistoryPage() {
                             displayScrollbar={false}
                             showGradients={true}
                             renderItem={(doc: any) => (
-                                <div className="group relative flex items-center justify-between p-8 rounded-2xl bg-white dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-gold/30 transition-all duration-700 overflow-hidden shadow-lg shadow-black/5">
+                                <GlassEffect className="group relative flex items-center justify-between p-8 rounded-2xl bg-white/5 dark:bg-white/5 border border-black/5 dark:border-white/5 hover:border-gold/30 transition-all duration-700 overflow-hidden shadow-lg shadow-black/5">
                                     <div className="absolute inset-0 bg-gradient-to-r from-gold/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                                     <div className="flex items-center gap-8 relative z-10">
@@ -175,7 +177,7 @@ export default function HistoryPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </GlassEffect>
                             )}
                         />
                     ) : (

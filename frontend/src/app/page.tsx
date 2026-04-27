@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import MobileHome from "@/components/MobileHome";
 import { useRef } from "react";
+import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 
 // Risk category data
 const riskCategories = [
@@ -50,6 +51,7 @@ export default function Home() {
 
       {/* Desktop Content */}
       <main ref={containerRef} className="hidden md:block overflow-x-hidden">
+        <GlassFilter />
 
         {/* ===================== HERO SECTION ===================== */}
         <section className="relative min-h-screen flex items-center pt-[68px] bg-[#F2EFE9] dark:bg-[#0E0F12] overflow-hidden">
@@ -400,9 +402,9 @@ function StepCard({ num, icon, title, desc }: { num: string; icon: React.ReactNo
       transition={{ delay: parseFloat(num) * 0.15 }}
       className="text-center group"
     >
-      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold/20 text-gold/40 group-hover:text-gold group-hover:border-gold/40 transition-all duration-500 mb-8">
+      <GlassEffect className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold/20 text-gold/40 group-hover:text-gold group-hover:border-gold/40 transition-all duration-500 mb-8 overflow-hidden">
         {icon}
-      </div>
+      </GlassEffect>
       <span className="font-mono text-[10px] text-gold tracking-[0.2em] mb-4 block">{num}</span>
       <h3 className="text-2xl font-serif font-light mb-4">{title}</h3>
       <p className="text-background/50 dark:text-foreground/50 font-light text-sm leading-relaxed max-w-xs mx-auto">{desc}</p>

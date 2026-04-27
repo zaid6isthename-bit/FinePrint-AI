@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Loader2, Mail, Lock, ArrowRight, Shield } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight, Shield, Eye, EyeOff } from "lucide-react";
 import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import MobileAuth from "@/components/MobileAuth";
 export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast();
 
@@ -129,13 +130,20 @@ export default function LoginPage() {
                                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/30" />
                                     <Input
                                         id="password"
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="pl-12 h-13 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/40 font-mono text-xs"
+                                        className="pl-12 pr-12 h-13 bg-transparent border border-black/10 dark:border-white/10 text-foreground rounded-sm focus:ring-gold/50 placeholder:text-muted-foreground/40 font-mono text-xs"
                                         required
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/30 hover:text-gold transition-colors focus:outline-none"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
                                 </div>
                             </div>
 

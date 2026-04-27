@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { FileText, ArrowRight, Calendar, Shield, Clock, ArrowLeft, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { GlassEffect, GlassFilter } from "@/components/ui/liquid-glass";
 
 interface DocHistory {
     id: string;
@@ -22,6 +23,7 @@ interface MobileHistoryProps {
 export default function MobileHistory({ history, loading, onDelete }: MobileHistoryProps) {
     return (
         <div className="flex flex-col min-h-screen bg-background text-foreground font-sans pt-12 pb-24 px-6 md:hidden overflow-x-hidden">
+            <GlassFilter />
             {/* Header */}
             <div className="flex items-center justify-between mb-10">
                 <Link href="/" className="p-2 -ml-2 text-gold/60">
@@ -53,13 +55,16 @@ export default function MobileHistory({ history, loading, onDelete }: MobileHist
             <div className="flex-1 space-y-6">
                 {history.length > 0 ? (
                     history.map((doc, idx) => (
-                        <motion.div
+                        <GlassEffect 
                             key={doc.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className="bg-card/40 border-l-2 border-gold/20 p-5 rounded-none backdrop-blur-md"
+                            className="bg-card/20 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-2xl overflow-hidden shadow-lg shadow-black/5"
                         >
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className="p-5"
+                            >
                             <div className="flex justify-between items-start mb-4">
                                 <div>
                                     <h3 className="font-serif text-lg text-foreground line-clamp-1">{doc.title}</h3>
@@ -97,7 +102,8 @@ export default function MobileHistory({ history, loading, onDelete }: MobileHist
                                     </Link>
                                 </div>
                             </div>
-                        </motion.div>
+                            </motion.div>
+                        </GlassEffect>
                     ))
                 ) : (
                     !loading && (
