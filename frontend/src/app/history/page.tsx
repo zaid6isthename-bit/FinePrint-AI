@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, ArrowRight, Calendar, Shield, Clock } from "lucide-react";
+import { FileText, ArrowRight, Calendar, Shield, Clock, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -47,6 +47,23 @@ export default function HistoryPage() {
         }
     };
 
+    const handleDelete = async (e: React.MouseEvent, id: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!confirm("Are you sure you want to delete this document from the vault? This action cannot be undone.")) {
+            return;
+        }
+
+        try {
+            await api.delete(`/documents/${id}`);
+            setHistory(prev => prev.filter(doc => doc.id !== id));
+        } catch (error) {
+            console.error("Failed to delete document:", error);
+            alert("Neural connection failure: Could not delete document.");
+        }
+    };
+
     if (authLoading || !isAuthenticated) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
@@ -59,7 +76,7 @@ export default function HistoryPage() {
         <main className="min-h-screen pt-[40px] md:pt-32 pb-24 px-0 md:px-6 lg:px-24 bg-background relative overflow-hidden">
             {/* Mobile UI */}
             <div className="md:hidden">
-                <MobileHistory history={history} loading={loading} />
+                <MobileHistory history={history} loading={loading} onDelete={handleDelete} />
             </div>
 
             {/* Desktop UI */}
@@ -121,31 +138,42 @@ export default function HistoryPage() {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-12 relative z-10">
-                                        <div className="text-right hidden sm:block">
-                                            {doc.status === "COMPLETED" ? (
-                                                <div>
-                                                    <div className="flex items-baseline justify-end">
-                                                        <span className={`text-4xl font-serif font-light tracking-tighter ${(doc.riskScore || 0) > 60 ? "text-red-400" : (doc.riskScore || 0) > 30 ? "text-gold" : "text-emerald-400"
-                                                            }`}>
-                                                            {Math.round(doc.riskScore || 0)}
-                                                        </span>
-                                                        <span className="text-[10px] font-mono font-bold text-zinc-600 ml-2 uppercase tracking-[0.3em]">Score</span>
+                                    <div className="flex items-center gap-4 relative z-10">
+                                        <div className="flex items-center gap-12">
+                                            <div className="text-right hidden sm:block">
+                                                {doc.status === "COMPLETED" ? (
+                                                    <div>
+                                                        <div className="flex items-baseline justify-end">
+                                                            <span className={`text-4xl font-serif font-light tracking-tighter ${(doc.riskScore || 0) > 60 ? "text-red-400" : (doc.riskScore || 0) > 30 ? "text-gold" : "text-emerald-400"
+                                                                }`}>
+                                                                {Math.round(doc.riskScore || 0)}
+                                                            </span>
+                                                            <span className="text-[10px] font-mono font-bold text-zinc-600 ml-2 uppercase tracking-[0.3em]">Score</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                <div className="px-5 py-2 rounded-sm border border-gold/20 bg-gold/5">
-                                                    <span className="text-[9px] font-mono font-bold text-gold uppercase tracking-widest">
-                                                        Processing...
-                                                    </span>
-                                                </div>
-                                            )}
+                                                ) : (
+                                                    <div className="px-5 py-2 rounded-sm border border-gold/20 bg-gold/5">
+                                                        <span className="text-[9px] font-mono font-bold text-gold uppercase tracking-widest">
+                                                            Processing...
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    onClick={(e) => handleDelete(e, doc.id)}
+                                                    className="h-14 w-14 p-0 rounded-xl hover:bg-red-500/10 text-zinc-600 hover:text-red-400 border border-black/5 dark:border-white/5 hover:border-red-500/30 transition-all duration-500"
+                                                >
+                                                    <Trash2 className="h-5 w-5" />
+                                                </Button>
+                                                <Link href={`/dashboard/${doc.id}`}>
+                                                    <Button variant="ghost" className="h-14 w-14 p-0 rounded-xl hover:bg-gold/10 text-zinc-600 hover:text-gold border border-black/5 dark:border-white/5 hover:border-gold/30 group-hover:translate-x-1 transition-all duration-500">
+                                                        <ArrowRight className="h-5 w-5" />
+                                                    </Button>
+                                                </Link>
+                                            </div>
                                         </div>
-                                        <Link href={`/dashboard/${doc.id}`}>
-                                            <Button variant="ghost" className="h-14 w-14 p-0 rounded-xl hover:bg-gold/10 text-zinc-600 hover:text-gold border border-black/5 dark:border-white/5 hover:border-gold/30 group-hover:translate-x-1 transition-all duration-500">
-                                                <ArrowRight className="h-5 w-5" />
-                                            </Button>
-                                        </Link>
                                     </div>
                                 </div>
                             )}

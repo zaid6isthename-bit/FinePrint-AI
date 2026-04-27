@@ -6,7 +6,7 @@ import './AnimatedList.css';
 
 const AnimatedItem = ({ children, delay = 0, index, onMouseEnter, onClick }: any) => {
   const ref = useRef(null);
-  const inView = useInView(ref, { amount: 0.5, triggerOnce: false });
+  const inView = useInView(ref, { amount: 0.5, once: false });
   return (
     <motion.div
       ref={ref}
@@ -67,11 +67,11 @@ const AnimatedList = ({
       if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
         e.preventDefault();
         setKeyboardNav(true);
-        setSelectedIndex(prev => Math.min(prev + 1, items.length - 1));
+        setSelectedIndex((prev: number) => Math.min(prev + 1, items.length - 1));
       } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
         e.preventDefault();
         setKeyboardNav(true);
-        setSelectedIndex(prev => Math.max(prev - 1, 0));
+        setSelectedIndex((prev: number) => Math.max(prev - 1, 0));
       } else if (e.key === 'Enter') {
         if (selectedIndex >= 0 && selectedIndex < items.length) {
           e.preventDefault();

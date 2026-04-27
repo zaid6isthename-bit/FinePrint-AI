@@ -4,9 +4,11 @@ from app.api.deps import get_current_user
 from app.db.prisma import db
 from app.schemas.document import DocumentResponse, ClauseResponse
 from app.services.document_service import DocumentService
+import logging
 from app.schemas.user import UserResponse
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 @router.post("/upload", response_model=DocumentResponse)
 async def upload_document(
@@ -108,3 +110,31 @@ async def get_document(document_id: str, current_user: UserResponse = Depends(ge
             raise e
         logger.error(f"Error fetching document {document_id}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Neural retrieval failure: {str(e)}")
+
+@router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_document(document_id: str, current_user: UserResponse = Depends(get_current_user)):
+    try:
+        # Check if document exists and belongs to user
+        document = await db.document.find_unique(
+            where={"id": document_id}
+        )
+        
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found.")
+            
+        if document.userId != current_user.id:
+            raise HTTPException(status_code=403, detail="Access denied. You can only delete your own documents.")
+            
+        # Delete dependent clauses first if they are not cascaded by the DB
+        # Prisma usually handles cascade if defined, but let's be safe if unsure of schema
+        await db.clause.delete_many(where={"documentId": document_id})
+        
+        # Delete the document
+        await db.document.delete(where={"id": document_id})
+        
+        return None
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        logger.error(f"Error deleting document {document_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete document: {str(e)}")

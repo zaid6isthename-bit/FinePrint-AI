@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, ArrowRight, Calendar, Shield, Clock, ArrowLeft, Search } from "lucide-react";
+import { FileText, ArrowRight, Calendar, Shield, Clock, ArrowLeft, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -16,9 +16,10 @@ interface DocHistory {
 interface MobileHistoryProps {
     history: DocHistory[];
     loading: boolean;
+    onDelete: (e: React.MouseEvent, id: string) => void;
 }
 
-export default function MobileHistory({ history, loading }: MobileHistoryProps) {
+export default function MobileHistory({ history, loading, onDelete }: MobileHistoryProps) {
     return (
         <div className="flex flex-col min-h-screen bg-background text-foreground font-sans pt-12 pb-24 px-6 md:hidden overflow-x-hidden">
             {/* Header */}
@@ -83,10 +84,18 @@ export default function MobileHistory({ history, loading }: MobileHistoryProps) 
                                         {doc.status === 'COMPLETED' ? 'Validated' : 'Queued'}
                                     </span>
                                 </div>
-                                <Link href={`/dashboard/${doc.id}`} className="text-gold flex items-center gap-1">
-                                    <span className="text-[9px] font-mono tracking-widest uppercase font-bold">Inquiry</span>
-                                    <ArrowRight className="h-3 w-3" />
-                                </Link>
+                                <div className="flex items-center gap-4">
+                                    <button 
+                                        onClick={(e) => onDelete(e, doc.id)}
+                                        className="text-red-400/60 hover:text-red-400 p-1 transition-colors"
+                                    >
+                                        <Trash2 className="h-3 w-3" />
+                                    </button>
+                                    <Link href={`/dashboard/${doc.id}`} className="text-gold flex items-center gap-1">
+                                        <span className="text-[9px] font-mono tracking-widest uppercase font-bold">Inquiry</span>
+                                        <ArrowRight className="h-3 w-3" />
+                                    </Link>
+                                </div>
                             </div>
                         </motion.div>
                     ))

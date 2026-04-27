@@ -61,14 +61,14 @@ export function AnalysisTheatre() {
   const dashOffset = circumference - (circumference * progress) / 100;
 
   return (
-    <div className="relative mx-auto flex h-[620px] w-full max-w-5xl items-center justify-center overflow-hidden px-6">
+    <div className="relative mx-auto flex min-h-[620px] w-full max-w-5xl items-center justify-center py-12 px-6">
       <div className="absolute inset-0">
         <div className="absolute left-[8%] top-[10%] h-56 w-56 rounded-full bg-gold/10 blur-[120px]" />
         <div className="absolute bottom-[8%] right-[10%] h-64 w-64 rounded-full bg-sky-500/10 blur-[140px]" />
         <motion.div
           animate={{ opacity: [0.2, 0.45, 0.2] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-[12%] rounded-[32px] border border-gold/10"
+          className="absolute inset-[12%] rounded-[32px] border border-gold/20 dark:border-gold/10"
         />
       </div>
 
@@ -76,7 +76,7 @@ export function AnalysisTheatre() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.22)] backdrop-blur-xl"
+          className="relative overflow-hidden rounded-[28px] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.08)] dark:shadow-[0_30px_80px_rgba(0,0,0,0.22)] backdrop-blur-xl"
         >
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -88,7 +88,7 @@ export function AnalysisTheatre() {
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#0e1118]/90 p-6">
+          <div className="relative overflow-hidden rounded-[24px] border border-black/10 dark:border-white/10 bg-white/90 dark:bg-[#0e1118]/90 p-6">
             <motion.div
               animate={{ y: ["-8%", "92%", "-8%"] }}
               transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
@@ -125,7 +125,7 @@ export function AnalysisTheatre() {
                     repeatDelay: 0.8,
                     ease: "easeInOut",
                   }}
-                  className="h-4 rounded-full bg-white/6"
+                  className="h-4 rounded-full bg-black/5 dark:bg-white/5"
                   style={{ width: line.width }}
                 />
               ))}
@@ -160,12 +160,12 @@ export function AnalysisTheatre() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.08 }}
-            className="rounded-[28px] border border-white/10 bg-white/5 p-8 backdrop-blur-xl"
+            className="rounded-[28px] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-8 backdrop-blur-xl"
           >
             <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.32em] text-gold/70">Processing State</div>
             <div className="relative mx-auto mb-6 flex h-36 w-36 items-center justify-center">
               <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+                <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="8" className="text-black/5 dark:text-white/10" />
                 <motion.circle
                   cx="60"
                   cy="60"
@@ -212,7 +212,7 @@ export function AnalysisTheatre() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.14 }}
-            className="rounded-[28px] border border-white/10 bg-white/5 p-8 backdrop-blur-xl"
+            className="rounded-[28px] border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-8 backdrop-blur-xl"
           >
             <div className="mb-6 font-mono text-[10px] uppercase tracking-[0.32em] text-gold/70">Pipeline Trace</div>
             <div className="space-y-5">
@@ -228,7 +228,7 @@ export function AnalysisTheatre() {
                       }}
                       transition={{ duration: 1.4, repeat: isCurrent ? Infinity : 0, ease: "easeInOut" }}
                       className={`mt-0.5 h-3.5 w-3.5 rounded-full ${
-                        isDone ? "bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.45)]" : isCurrent ? "bg-gold shadow-[0_0_18px_rgba(200,169,106,0.45)]" : "bg-white/20"
+                        isDone ? "bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.45)]" : isCurrent ? "bg-gold shadow-[0_0_18px_rgba(200,169,106,0.45)]" : "bg-black/10 dark:bg-white/20"
                       }`}
                     />
                     <div className="flex-1">
