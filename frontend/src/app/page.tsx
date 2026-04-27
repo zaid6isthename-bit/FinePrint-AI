@@ -403,7 +403,9 @@ function StepCard({ num, icon, title, desc }: { num: string; icon: React.ReactNo
       className="text-center group"
     >
       <GlassEffect className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gold/20 text-gold/40 group-hover:text-gold group-hover:border-gold/40 transition-all duration-500 mb-8 overflow-hidden">
-        {icon}
+        <div className="flex items-center justify-center w-full h-full">
+          {icon}
+        </div>
       </GlassEffect>
       <span className="font-mono text-[10px] text-gold tracking-[0.2em] mb-4 block">{num}</span>
       <h3 className="text-2xl font-serif font-light mb-4">{title}</h3>
